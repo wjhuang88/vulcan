@@ -99,7 +99,7 @@ enum BeanConverterHelper {
             }
             try {
                 converter = makeUnloaded(srcClass, distClass)
-                        .load(ClassLoader.getSystemClassLoader())
+                        .load(BeanConverter.class.getClassLoader())
                         .getLoaded()
                         .getDeclaredConstructor()
                         .newInstance();

@@ -52,7 +52,7 @@ enum MapConverterHelper {
 
         try {
             final MapConverter<?> converter = makeUnloaded(distClass)
-                    .load(ClassLoader.getSystemClassLoader())
+                    .load(MapConverter.class.getClassLoader())
                     .getLoaded()
                     .getDeclaredConstructor()
                     .newInstance();
