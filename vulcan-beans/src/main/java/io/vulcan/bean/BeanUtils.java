@@ -5,16 +5,19 @@
 package io.vulcan.bean;
 
 import io.vulcan.api.convertible.FromMap;
+import io.vulcan.api.convertible.IntoMap;
+import io.vulcan.api.helper.bean2bean.BeanConverter;
+import io.vulcan.api.helper.map2bean.MapConverter;
 import io.vulcan.bean.helper.DateConverter;
-import io.vulcan.bean.helper.bean2bean.BeanConverter;
-import io.vulcan.bean.helper.map2bean.MapConverter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
@@ -84,8 +87,7 @@ public final class BeanUtils {
     }
 
     /**
-     * Convert map to java bean instance with a instance but not a class. <b>instance will not be changed, a new
-     * instance will be returned</b>
+     * Convert map to java bean instance with a instance but not a class.
      *
      * @param map      map to be converted
      * @param instance an instance of the class to be converted
@@ -201,6 +203,12 @@ public final class BeanUtils {
      * @return the result instance with type D
      */
     public static <D, S> D beanToBean(final S src, final D dist) {
+        if (src instanceof Map) {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> mapSrc = (Map<String, Object>) src;
+            return mapToBean(mapSrc, dist);
+        }
+
         final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
         if (result.isPresent()) {
             return result.get();
@@ -275,6 +283,30 @@ public final class BeanUtils {
         return null;
     }
 
+    /**
+     * Convert a java bean to a map.
+     *
+     * @param bean bean to be converted
+     * @param <T>  bean type
+     * @return result map
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Map<String, Object> beanToMap(final T bean) {
+        if (bean instanceof IntoMap) {
+            final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
+            return (Map<String, Object>) map;
+        }
+
+        final BeanMap beanMap = new BeanMap();
+        beanMap.setBean(bean);
+        Map<String, Object> copy = new HashMap<>();
+
+        for (Object key : beanMap.keySet()) {
+            copy.put(key.toString(), beanMap.get(key));
+        }
+        return copy;
+    }
+
     public static <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz) {
         if (mapList == null || mapList.isEmpty()) {
             return Collections.emptyList();
@@ -286,6 +318,13 @@ public final class BeanUtils {
         }
 
         return mapList.stream().map(input -> mapToBean(converter, input, clazz)).collect(Collectors.toList());
+    }
+
+    public static <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList) {
+        if (beanList == null || beanList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return beanList.stream().map(BeanUtils::beanToMap).collect(Collectors.toList());
     }
 
     public static <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass) {

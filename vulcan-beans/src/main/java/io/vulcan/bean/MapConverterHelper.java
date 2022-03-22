@@ -5,7 +5,7 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.vulcan.bean.helper.map2bean.MapConverter;
+import io.vulcan.api.helper.map2bean.MapConverter;
 import io.vulcan.bean.helper.map2bean.MapToBeanMethodImpl;
 import io.vulcan.bean.helper.translator.Translators;
 import io.vulcan.bean.helper.translator.bytecode.TranslatorImplementation;
@@ -52,7 +52,7 @@ enum MapConverterHelper {
 
         try {
             final MapConverter<?> converter = makeUnloaded(distClass)
-                    .load(MapConverter.class.getClassLoader())
+                    .load(ClassLoader.getSystemClassLoader())
                     .getLoaded()
                     .getDeclaredConstructor()
                     .newInstance();
@@ -87,7 +87,7 @@ enum MapConverterHelper {
             }
             try {
                 converter = makeUnloaded(clazz)
-                        .load(ClassLoader.getSystemClassLoader())
+                        .load(MapConverter.class.getClassLoader())
                         .getLoaded()
                         .getDeclaredConstructor()
                         .newInstance();

@@ -7,7 +7,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.vulcan.api.convertible.From;
 import io.vulcan.api.convertible.Into;
-import io.vulcan.bean.helper.bean2bean.BeanConverter;
+import io.vulcan.api.helper.bean2bean.BeanConverter;
 import io.vulcan.bean.helper.bean2bean.BeanToBeanMethodImpl;
 import io.vulcan.bean.helper.translator.Translators;
 import io.vulcan.bean.helper.translator.bytecode.TranslatorImplementation;
@@ -60,6 +60,8 @@ enum BeanConverterHelper {
         if (cached != null) {
             return;
         }
+
+//        saveClassFile(srcClass, distClass, "temp");
 
         try {
             final BeanConverter<?, ?> converter = makeUnloaded(srcClass, distClass)

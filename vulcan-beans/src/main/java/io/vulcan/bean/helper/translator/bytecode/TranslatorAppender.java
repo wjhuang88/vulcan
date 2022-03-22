@@ -1,7 +1,7 @@
 package io.vulcan.bean.helper.translator.bytecode;
 
-import io.vulcan.bean.helper.translator.Translators;
 import io.vulcan.bean.helper.ValidStackManipulation;
+import io.vulcan.bean.helper.translator.Translators;
 import java.util.Collections;
 import java.util.List;
 import net.bytebuddy.description.method.MethodDescription;

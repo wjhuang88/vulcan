@@ -21,6 +21,7 @@ public enum Translators {
         translatorMap.put(java.sql.Timestamp.class, SqlTimestampTranslator.INSTANCE);
         translatorMap.put(BigDecimal.class, BigDecimalTranslator.INSTANCE);
         translatorMap.put(BigInteger.class, BigIntegerTranslator.INSTANCE);
+        translatorMap.put(String.class, StringTranslator.INSTANCE);
     }
 
     /**

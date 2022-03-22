@@ -1,4 +1,4 @@
-package io.vulcan.bean.helper.map2bean;
+package io.vulcan.api.helper.map2bean;
 
 import java.util.Map;
 

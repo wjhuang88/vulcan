@@ -16,13 +16,14 @@
  */
 package io.vulcan.bean.helper;
 
-import io.vulcan.datetime.DateTimeUtils;
 import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -183,11 +184,15 @@ public final class DateConverter extends AbstractConverter {
         } else if (value instanceof Long) {
             date = new Date((Long) value);
         } else if (value instanceof LocalDate) {
-            date = DateTimeUtils.date((LocalDate) value);
+            final Instant inst = Instant.from(((LocalDate) value).atStartOfDay(ZoneId.systemDefault()));
+            date = Date.from(inst);
         } else if ((value instanceof LocalDateTime)) {
-            date = DateTimeUtils.date((LocalDateTime) value);
+            final Instant inst = Instant.from(((LocalDateTime) value).atZone(ZoneId.systemDefault()));
+            date = Date.from(inst);
         } else if (value instanceof LocalTime) {
-            date = DateTimeUtils.date(((LocalTime) value).atDate(DateTimeUtils.localDate(new Date())));
+            final LocalDateTime ldt = ((LocalTime) value).atDate(LocalDate.now());
+            final Instant inst = Instant.from(ldt);
+            date = Date.from(inst);
         }
 
         String result = null;
@@ -280,17 +285,17 @@ public final class DateConverter extends AbstractConverter {
         }
 
         if (value instanceof LocalDate) {
-            Date date = DateTimeUtils.date((LocalDate) value);
+            Date date = Date.from(Instant.from(((LocalDate) value).atStartOfDay(ZoneId.systemDefault())));
             return toDate(targetType, date.getTime());
         }
 
         if ((value instanceof LocalDateTime)) {
-            Date date = DateTimeUtils.date((LocalDateTime) value);
+            Date date = Date.from(Instant.from(((LocalDateTime) value).atZone(ZoneId.systemDefault())));
             return toDate(targetType, date.getTime());
         }
 
         if (value instanceof LocalTime) {
-            Date date = DateTimeUtils.date(((LocalTime) value).atDate(DateTimeUtils.localDate(new Date())));
+            Date date = Date.from(Instant.from(((LocalTime) value).atDate(LocalDate.now()).atZone(ZoneId.systemDefault())));
             return toDate(targetType, date.getTime());
         }
 
