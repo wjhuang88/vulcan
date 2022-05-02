@@ -1,3 +1,4 @@
 rootProject.name = 'vulcan'
 include 'vulcan-beans'
+include 'vulcan-dependencies'
 

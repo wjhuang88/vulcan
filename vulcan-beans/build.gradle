@@ -10,23 +10,18 @@ java {
     targetCompatibility JavaVersion.VERSION_1_8
 }
 
-group 'io.vulcan'
-version '1.0'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
 
-    api 'com.github.ben-manes.caffeine:caffeine:2.8.8'
-    api 'net.bytebuddy:byte-buddy:1.11.18'
-    api 'org.slf4j:slf4j-api:1.7.32'
-    api 'commons-beanutils:commons-beanutils:1.9.4'
+    api platform(project(":vulcan-dependencies"))
 
-    testImplementation 'com.caucho:hessian:4.0.65'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    api 'com.github.ben-manes.caffeine:caffeine'
+    api 'net.bytebuddy:byte-buddy'
+    api 'org.slf4j:slf4j-api'
+    api 'commons-beanutils:commons-beanutils'
+
+    testImplementation 'com.caucho:hessian'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
 test {

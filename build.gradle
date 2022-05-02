@@ -6,4 +6,8 @@ plugins {
 allprojects {
     group GROUP_ID
     version PLATFORM_VERSION
+
+    repositories {
+        mavenCentral()
+    }
 }
