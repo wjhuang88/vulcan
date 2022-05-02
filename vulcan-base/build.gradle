@@ -2,15 +2,10 @@ plugins {
     id 'java-library'
 }
 
-description 'vulcan api definitions'
-
-java {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-}
-
 dependencies {
-    api platform(project(":vulcan-dependencies"))
+    api project(":vulcan-api")
+
+    api 'org.slf4j:slf4j-api'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
