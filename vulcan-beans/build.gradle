@@ -12,7 +12,7 @@ java {
 
 dependencies {
 
-    api platform(project(":vulcan-dependencies"))
+    api project(":vulcan-api")
 
     api 'com.github.ben-manes.caffeine:caffeine'
     api 'net.bytebuddy:byte-buddy'
