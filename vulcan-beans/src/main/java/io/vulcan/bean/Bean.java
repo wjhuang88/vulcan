@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2016. Runyi Co., Ltd. All rights reserved.
- */
-
 package io.vulcan.bean;
 
 import io.vulcan.api.convertible.FromMap;
@@ -24,22 +20,15 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by GHuang on 16/8/10. Bean and Map convert utils.
- */
-public final class BeanUtils {
+public final class Bean {
 
-    private static final Logger log = LoggerFactory.getLogger(BeanUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(Bean.class);
 
-    private static final BeanUtilsBean beanUtilsBean;
-    private static final MapConverterHelper mapConverterHelper = MapConverterHelper.INSTANCE;
-    private static final BeanConverterHelper beanConverterHelper = BeanConverterHelper.INSTANCE;
+    private final BeanUtilsBean beanUtilsBean;
+    private final MapConverterHelper mapConverterHelper = MapConverterHelper.INSTANCE;
+    private final BeanConverterHelper beanConverterHelper = BeanConverterHelper.INSTANCE;
 
-    private BeanUtils() {
-        // prevent to create new instance
-    }
-
-    static {
+    private Bean() {
         final DateConverter dtConverter = DateConverter.getInstance();
         final ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
         convertUtilsBean.deregister(Date.class);
@@ -47,19 +36,27 @@ public final class BeanUtils {
         beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());
     }
 
-    public static <T> void register(Class<T> distClass, MapConverter<T> converter) {
+    private static class BeanHolder {
+        private final static Bean INSTANCE = new Bean();
+    }
+
+    public static Bean getInstance() {
+        return BeanHolder.INSTANCE;
+    }
+
+    public <T> void register(Class<T> distClass, MapConverter<T> converter) {
         mapConverterHelper.addConverter(distClass, converter);
     }
 
-    public static <T> void speedup(Class<T> distClass) {
+    public <T> void speedup(Class<T> distClass) {
         mapConverterHelper.addConverter(distClass);
     }
 
-    public static <S, D> void register(Class<S> srcClass, Class<D> distClass, BeanConverter<S, D> converter) {
+    public <S, D> void register(Class<S> srcClass, Class<D> distClass, BeanConverter<S, D> converter) {
         beanConverterHelper.addConverter(srcClass, distClass, converter);
     }
 
-    public static <S, D> void speedup(Class<S> srcClass, Class<D> distClass) {
+    public <S, D> void speedup(Class<S> srcClass, Class<D> distClass) {
         beanConverterHelper.addConverter(srcClass, distClass);
     }
 
@@ -72,7 +69,7 @@ public final class BeanUtils {
      * @param <T>   type parameter
      * @return the result instance with type T
      */
-    public static <T> T mapToBean(final Map<String, Object> map, final Class<T> clazz) {
+    public <T> T mapToBean(final Map<String, Object> map, final Class<T> clazz) {
 
         final T instance;
         try {
@@ -94,7 +91,7 @@ public final class BeanUtils {
      * @param <T>      type parameter
      * @return the result instance with type T
      */
-    public static <T> T mapToBean(final Map<String, Object> map, final T instance) {
+    public <T> T mapToBean(final Map<String, Object> map, final T instance) {
 
         if (instance instanceof FromMap) {
             ((FromMap) instance).from(map);
@@ -115,7 +112,7 @@ public final class BeanUtils {
         }
     }
 
-    private static <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final T instance) {
+    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final T instance) {
         if (instance instanceof FromMap) {
             ((FromMap) instance).from(map);
             return instance;
@@ -129,7 +126,7 @@ public final class BeanUtils {
         }
     }
 
-    private static <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final Class<T> clazz) {
+    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final Class<T> clazz) {
         final T instance;
         try {
             instance = clazz.getDeclaredConstructor().newInstance();
@@ -142,7 +139,7 @@ public final class BeanUtils {
         return null;
     }
 
-    static <T> T mapToBeanOld(final Map<String, Object> map, final T instance) {
+    <T> T mapToBeanOld(final Map<String, Object> map, final T instance) {
         if (instance instanceof FromMap) {
             ((FromMap) instance).from(map);
             return instance;
@@ -156,7 +153,7 @@ public final class BeanUtils {
         return instance;
     }
 
-    static <T> T mapToBeanOld(final Map<String, Object> map, final Class<T> clazz) {
+    <T> T mapToBeanOld(final Map<String, Object> map, final Class<T> clazz) {
         final T instance;
         try {
             instance = clazz.getDeclaredConstructor().newInstance();
@@ -179,7 +176,7 @@ public final class BeanUtils {
      * @param <S>       src instance type
      * @return the result instance with type D
      */
-    public static <D, S> D beanToBean(final S src, final Class<D> distClass) {
+    public <D, S> D beanToBean(final S src, final Class<D> distClass) {
         final D dist;
         try {
             dist = distClass.getDeclaredConstructor().newInstance();
@@ -202,7 +199,7 @@ public final class BeanUtils {
      * @param <S>  src instance type
      * @return the result instance with type D
      */
-    public static <D, S> D beanToBean(final S src, final D dist) {
+    public <D, S> D beanToBean(final S src, final D dist) {
         if (src instanceof Map) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> mapSrc = (Map<String, Object>) src;
@@ -227,7 +224,7 @@ public final class BeanUtils {
         }
     }
 
-    static <D, S> D beanToBeanOld(final S src, final D dist) {
+    <D, S> D beanToBeanOld(final S src, final D dist) {
         final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
         if (result.isPresent()) {
             return result.get();
@@ -241,7 +238,7 @@ public final class BeanUtils {
         return dist;
     }
 
-    static <D, S> D beanToBeanOld(final S src, final Class<D> distClass) {
+    <D, S> D beanToBeanOld(final S src, final Class<D> distClass) {
 
         final D dist;
         try {
@@ -255,7 +252,7 @@ public final class BeanUtils {
         return null;
     }
 
-    private static <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final D dist) {
+    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final D dist) {
         final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
         if (result.isPresent()) {
             return result.get();
@@ -269,7 +266,7 @@ public final class BeanUtils {
         }
     }
 
-    private static <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final Class<D> distClass) {
+    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final Class<D> distClass) {
 
         final D dist;
         try {
@@ -291,7 +288,7 @@ public final class BeanUtils {
      * @return result map
      */
     @SuppressWarnings("unchecked")
-    public static <T> Map<String, Object> beanToMap(final T bean) {
+    public <T> Map<String, Object> beanToMap(final T bean) {
         if (bean instanceof IntoMap) {
             final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
             return (Map<String, Object>) map;
@@ -307,7 +304,7 @@ public final class BeanUtils {
         return copy;
     }
 
-    public static <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz) {
+    public <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz) {
         if (mapList == null || mapList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -320,14 +317,14 @@ public final class BeanUtils {
         return mapList.stream().map(input -> mapToBean(converter, input, clazz)).collect(Collectors.toList());
     }
 
-    public static <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList) {
+    public <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList) {
         if (beanList == null || beanList.isEmpty()) {
             return Collections.emptyList();
         }
-        return beanList.stream().map(BeanUtils::beanToMap).collect(Collectors.toList());
+        return beanList.stream().map(this::beanToMap).collect(Collectors.toList());
     }
 
-    public static <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass) {
+    public <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass) {
         if (srcList == null || srcList.isEmpty()) {
             return Collections.emptyList();
         }

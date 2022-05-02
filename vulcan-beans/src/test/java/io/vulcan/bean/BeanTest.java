@@ -29,7 +29,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class BeanUtilsTest {
+class BeanTest {
+
+    private final Bean beanManager = Bean.getInstance();
 
     private final static Date dateForTest;
 
@@ -63,7 +65,7 @@ class BeanUtilsTest {
     @Test
     public void beanToBeanTest() throws Exception {
 
-        TestBeanDist dist = BeanUtils.beanToBean(bean, TestBeanDist.class);
+        TestBeanDist dist = beanManager.beanToBean(bean, TestBeanDist.class);
         assertNotNull(dist);
         assertEquals(bean.getFieldA(), dist.getFieldA());
         assertEquals(bean.getFieldB(), dist.getFieldB());
@@ -71,7 +73,7 @@ class BeanUtilsTest {
         assertEquals(bean.getFieldD().getFieldDate().getTime(), dist.getFieldD().getFieldDate().getTime());
 
         TestBeanDist testSameDest = new TestBeanDist();
-        TestBeanDist testSameDestResult = BeanUtils.beanToBean(bean, testSameDest);
+        TestBeanDist testSameDestResult = beanManager.beanToBean(bean, testSameDest);
         assertSame(testSameDest, testSameDestResult);
         assertEquals(bean.getFieldA(), testSameDest.getFieldA());
         assertEquals(bean.getFieldB(), testSameDest.getFieldB());
@@ -83,26 +85,26 @@ class BeanUtilsTest {
         parentBean.setFieldB("field-b-p");
 
         TestDistFromParent fromParent = new TestDistFromParent();
-        BeanUtils.beanToBean(bean, fromParent);
+        beanManager.beanToBean(bean, fromParent);
         assertEquals(bean.getFieldA(), fromParent.getFieldA());
         assertEquals(bean.getFieldB(), fromParent.getFieldB());
         assertNull(fromParent.getFieldC());
         assertNull(fromParent.getFieldD());
 
-        BeanUtils.beanToBean(parentBean, fromParent);
+        beanManager.beanToBean(parentBean, fromParent);
         assertEquals(parentBean.getFieldA(), fromParent.getFieldA());
         assertEquals(parentBean.getFieldB(), fromParent.getFieldB());
         assertNull(fromParent.getFieldC());
         assertNull(fromParent.getFieldD());
 
         TestDistFromChild fromChild = new TestDistFromChild();
-        BeanUtils.beanToBean(bean, fromChild);
+        beanManager.beanToBean(bean, fromChild);
         assertEquals(bean.getFieldA(), fromChild.getFieldA());
         assertEquals(bean.getFieldB(), fromChild.getFieldB());
         assertEquals(bean.getFieldC(), fromChild.getFieldC());
         assertEquals(bean.getFieldD().getFieldDate().getTime(), fromChild.getFieldD().getFieldDate().getTime());
 
-        BeanUtils.beanToBean(parentBean, fromChild);
+        beanManager.beanToBean(parentBean, fromChild);
         assertEquals(parentBean.getFieldA(), fromChild.getFieldA());
         assertEquals(parentBean.getFieldB(), fromChild.getFieldB());
         assertEquals(bean.getFieldC(), fromChild.getFieldC());
@@ -112,27 +114,27 @@ class BeanUtilsTest {
         TestBeanChild child;
         TestSrcIntoParent intoParent = new TestSrcIntoParent(bean);
         child = new TestBeanChild();
-        BeanUtils.beanToBean(intoParent, child);
+        beanManager.beanToBean(intoParent, child);
         assertEquals(bean.getFieldA(), child.getFieldA());
         assertEquals(bean.getFieldB(), child.getFieldB());
         assertNull(child.getFieldC());
         assertNull(child.getFieldD());
 
         parent = new TestBeanParent();
-        BeanUtils.beanToBean(intoParent, parent);
+        beanManager.beanToBean(intoParent, parent);
         assertEquals(bean.getFieldA(), parent.getFieldA());
         assertEquals(bean.getFieldB(), parent.getFieldB());
 
         TestSrcIntoChild intoChild = new TestSrcIntoChild(bean);
         child = new TestBeanChild();
-        BeanUtils.beanToBean(intoChild, child);
+        beanManager.beanToBean(intoChild, child);
         assertEquals(bean.getFieldA(), child.getFieldA());
         assertEquals(bean.getFieldB(), child.getFieldB());
         assertEquals(bean.getFieldC(), child.getFieldC());
         assertEquals(bean.getFieldD().getFieldDate().getTime(), child.getFieldD().getFieldDate().getTime());
 
         parent = new TestBeanParent();
-        BeanUtils.beanToBean(intoChild, parent);
+        beanManager.beanToBean(intoChild, parent);
         assertEquals(bean.getFieldA(), parent.getFieldA());
         assertEquals(bean.getFieldB(), parent.getFieldB());
     }
@@ -149,7 +151,7 @@ class BeanUtilsTest {
         typeSrc.setFieldStringArr(new String[]{"test_str_string_0", "test_str_string_1"});
         typeSrc.setFieldIntArr(new int[]{0, 1});
 
-        TestTypesDist typeDist = BeanUtils.beanToBean(typeSrc, TestTypesDist.class);
+        TestTypesDist typeDist = beanManager.beanToBean(typeSrc, TestTypesDist.class);
         assertNotNull(typeDist);
         assertEquals(now.getTime(), typeDist.getFieldDate().getTime());
         assertEquals("test_string_filed", typeDist.getFieldString());
@@ -173,7 +175,7 @@ class BeanUtilsTest {
         testMap.put("fieldLongBox", 30L);
         testMap.put("fieldStringArr", new String[]{"test_str_string_0", "test_str_string_1"});
         testMap.put("fieldIntArr", new int[]{0, 1});
-        TestTypes testTypes = BeanUtils.mapToBean(testMap, TestTypes.class);
+        TestTypes testTypes = beanManager.mapToBean(testMap, TestTypes.class);
 
         assertNotNull(testTypes);
         assertEquals(now.getTime(), testTypes.getFieldDate().getTime());
@@ -187,26 +189,26 @@ class BeanUtilsTest {
         assertEquals(1, testTypes.getFieldIntArr()[1]);
 
         TestTypes testSameInst = new TestTypes();
-        TestTypes testSameInstResult = BeanUtils.mapToBean(testMap, testSameInst);
+        TestTypes testSameInstResult = beanManager.mapToBean(testMap, testSameInst);
         assertSame(testSameInst, testSameInstResult);
         assertEquals(now.getTime(), testSameInst.getFieldDate().getTime());
 
         Map<String, Object> testConvertMap = new HashMap<>();
         testConvertMap.put("fieldDate", LocalDateTime.ofInstant(Instant.ofEpochMilli(now.getTime()), ZoneId.systemDefault()));
-        TestTypes testConvertDate = BeanUtils.mapToBean(testConvertMap, TestTypes.class);
+        TestTypes testConvertDate = beanManager.mapToBean(testConvertMap, TestTypes.class);
         assertNotNull(testConvertDate);
         assertEquals(now.getTime(), testConvertDate.getFieldDate().getTime());
 
         Map<String, Object> testConvertLongMap = new HashMap<>();
         testConvertLongMap.put("fieldDate", now.getTime());
-        TestTypes testConvertLongDate = BeanUtils.mapToBean(testConvertLongMap, TestTypes.class);
+        TestTypes testConvertLongDate = beanManager.mapToBean(testConvertLongMap, TestTypes.class);
         assertNotNull(testConvertLongDate);
         assertEquals(now.getTime(), testConvertLongDate.getFieldDate().getTime());
     }
 
     @Test
     public void serializeTest() throws Exception {
-        TestBeanChild bean = BeanUtils.mapToBean(testMap, TestBeanChild.class);
+        TestBeanChild bean = beanManager.mapToBean(testMap, TestBeanChild.class);
         assertNotNull(bean);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         HessianOutput ho = new HessianOutput(os);
@@ -233,13 +235,13 @@ class BeanUtilsTest {
         typeSrc.setFieldIntArr(new int[]{0, 1});
 
         long warmStart = System.nanoTime();
-        BeanUtils.speedup(TestTypes.class, TestTypesDist.class);
+        beanManager.speedup(TestTypes.class, TestTypesDist.class);
         long warmDelta = System.nanoTime() - warmStart;
         System.out.println("bean预热耗时: " + TimeUnit.NANOSECONDS.toMillis(warmDelta));
         TestTypesDist typeDist = null;
         long newStart = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
-            typeDist = BeanUtils.beanToBean(typeSrc, TestTypesDist.class);
+            typeDist = beanManager.beanToBean(typeSrc, TestTypesDist.class);
         }
         long newDelta = System.nanoTime() - newStart;
         System.out.println("bean新方法耗时: " + TimeUnit.NANOSECONDS.toMillis(newDelta));
@@ -258,7 +260,7 @@ class BeanUtilsTest {
         TestTypesDist typeDistOld = null;
         long oldStart = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
-            typeDistOld = BeanUtils.beanToBeanOld(typeSrc, TestTypesDist.class);
+            typeDistOld = beanManager.beanToBeanOld(typeSrc, TestTypesDist.class);
         }
         long oldDelta = System.nanoTime() - oldStart;
         System.out.println("bean老方法耗时: " + TimeUnit.NANOSECONDS.toMillis(oldDelta));
@@ -290,13 +292,13 @@ class BeanUtilsTest {
         testMap.put("fieldIntArr", new int[]{0, 1});
 
         long warmStart = System.nanoTime();
-        BeanUtils.speedup(TestTypes.class);
+        beanManager.speedup(TestTypes.class);
         long warmDelta = System.nanoTime() - warmStart;
         System.out.println("map预热耗时: " + TimeUnit.NANOSECONDS.toMillis(warmDelta));
         TestTypes testTypes = null;
         long newStart = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
-            testTypes = BeanUtils.mapToBean(testMap, TestTypes.class);
+            testTypes = beanManager.mapToBean(testMap, TestTypes.class);
         }
         long newDelta = System.nanoTime() - newStart;
         System.out.println("map新方法耗时: " + TimeUnit.NANOSECONDS.toMillis(newDelta));
@@ -315,7 +317,7 @@ class BeanUtilsTest {
         TestTypes testTypesOld = null;
         long oldStart = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
-            testTypesOld = BeanUtils.mapToBeanOld(testMap, TestTypes.class);
+            testTypesOld = beanManager.mapToBeanOld(testMap, TestTypes.class);
         }
         long oldDelta = System.nanoTime() - oldStart;
         System.out.println("map老方法耗时: " + TimeUnit.NANOSECONDS.toMillis(oldDelta));
@@ -339,7 +341,7 @@ class BeanUtilsTest {
         TestLongProp longProp = new TestLongProp();
         Map<String, Object> map = TestLongProp.makeMap();
 
-        TestLongPropDist mapDist = BeanUtils.mapToBean(map, TestLongPropDist.class);
+        TestLongPropDist mapDist = beanManager.mapToBean(map, TestLongPropDist.class);
         assertNotNull(mapDist);
         assertEquals(0L, mapDist.getLong1());
         assertEquals(2L, mapDist.getLong2());
@@ -361,7 +363,7 @@ class BeanUtilsTest {
         assertEquals(4.5, mapDist.getDouble5());
         assertEquals(4.6, mapDist.getDouble6());
 
-        TestLongPropDist beanDist = BeanUtils.beanToBean(longProp, TestLongPropDist.class);
+        TestLongPropDist beanDist = beanManager.beanToBean(longProp, TestLongPropDist.class);
         assertNotNull(beanDist);
         assertEquals(0L, beanDist.getLong1());
         assertEquals(2L, beanDist.getLong2());
