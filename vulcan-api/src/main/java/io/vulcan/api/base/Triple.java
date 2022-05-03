@@ -15,7 +15,7 @@ public class Triple<A, B, C> implements Serializable {
 
     public Triple(A first, B second, C third) {
         if (null == first || null == second || null == third) {
-            throw new IllegalArgumentException("Triple cannot have null item.");
+            throw new IllegalArgumentException("Triple cannot have null element.");
         }
         this.first = first;
         this.second = second;
@@ -27,7 +27,7 @@ public class Triple<A, B, C> implements Serializable {
             throw new IllegalArgumentException("Collection is null.");
         }
         if (collection.size() < 3) {
-            throw new IllegalArgumentException("Collection must have at least 3 items.");
+            throw new IllegalArgumentException("Collection must have at least 3 elements.");
         }
         final Iterator<T> iterator = collection.iterator();
         return new Triple<>(iterator.next(), iterator.next(), iterator.next());
@@ -47,7 +47,7 @@ public class Triple<A, B, C> implements Serializable {
 
     public List<A> toList() {
         if (first.getClass() != second.getClass() || first.getClass() != third.getClass()) {
-            throw new IllegalStateException("Only Triple with same type items can be converted to list.");
+            throw new IllegalStateException("Only Triple with same element types can be converted to list.");
         }
         List<A> list = new ArrayList<>();
         list.add(first);
