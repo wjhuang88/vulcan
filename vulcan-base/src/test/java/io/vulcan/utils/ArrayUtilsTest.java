@@ -40,7 +40,7 @@ class ArrayUtilsTest {
     int[][] intArrEmpty = new int[0][];
 
     @Test
-    void append() {
+    void appendTest() {
         assertArrayEquals(ArrayUtils.append(booleanEmpty, true), new boolean[] {true});
         assertArrayEquals(ArrayUtils.append(booleanNotEmpty, true), new boolean[] {true, false, false, true, true});
         assertArrayEquals(ArrayUtils.append(booleanNotEmpty, true, false, false), new boolean[] {true, false, false, true, true, false, false});
@@ -84,6 +84,64 @@ class ArrayUtilsTest {
         assertArrayEquals(ArrayUtils.append(intArrEmpty, new int[] {9}), new int[][] {{9}});
         assertArrayEquals(ArrayUtils.append(intArrNotEmpty, new int[] {9}), new int[][] {{1, 2, 3}, {4, 5}, {9}});
         assertArrayEquals(ArrayUtils.append(intArrNotEmpty, new int[] {9}, new int[] {9}), new int[][] {{1, 2, 3}, {4, 5}, {9}, {9}});
+    }
+
+    @Test
+    void insertTest() {
+        assertArrayEquals(ArrayUtils.insert(booleanEmpty, true), new boolean[] {true});
+        assertArrayEquals(ArrayUtils.insert(booleanNotEmpty, true), new boolean[] {true, true, false, false, true});
+        assertArrayEquals(ArrayUtils.insert(2, booleanNotEmpty, true), new boolean[] {true, false, true, false, true});
+        assertArrayEquals(ArrayUtils.insert(booleanNotEmpty, true, false, false), new boolean[] {true, false, false, true, false, false, true});
+
+        assertArrayEquals(ArrayUtils.insert(byteEmpty, (byte) 9), new byte[] {9});
+        assertArrayEquals(ArrayUtils.insert(byteNotEmpty, (byte) 9), new byte[] {9, 1, 2, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(2, byteNotEmpty, (byte) 9), new byte[] {1, 2, 9, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(byteNotEmpty, (byte) 9, (byte) 10), new byte[] {9, 10, 1, 2, 3, 4});
+
+        assertArrayEquals(ArrayUtils.insert(charEmpty, 'o'), new char[] {'o'});
+        assertArrayEquals(ArrayUtils.insert(charNotEmpty, 'o'), new char[] {'o', 'a', 'b', 'c', 'd'});
+        assertArrayEquals(ArrayUtils.insert(2, charNotEmpty, 'o'), new char[] {'a', 'b', 'o', 'c', 'd'});
+        assertArrayEquals(ArrayUtils.insert(charNotEmpty, 'o', '0'), new char[] {'o', '0', 'a', 'b', 'c', 'd'});
+
+        assertArrayEquals(ArrayUtils.insert(doubleEmpty, 9.9999), new double[] {9.9999});
+        assertArrayEquals(ArrayUtils.insert(doubleNotEmpty, 9.9999), new double[] {9.9999, 1.1, 2.1, 3.1, 4.1});
+        assertArrayEquals(ArrayUtils.insert(2, doubleNotEmpty, 9.9999), new double[] {1.1, 2.1, 9.9999, 3.1, 4.1});
+        assertArrayEquals(ArrayUtils.insert(doubleNotEmpty, 9.9999, 10.0), new double[] {9.9999, 10.0, 1.1, 2.1, 3.1, 4.1});
+
+        assertArrayEquals(ArrayUtils.insert(floatEmpty, 9.9999F), new float[] {9.9999F});
+        assertArrayEquals(ArrayUtils.insert(floatNotEmpty, 9.9999F), new float[] {9.9999F, 1.1F, 2.1F, 3.1F, 4.1F});
+        assertArrayEquals(ArrayUtils.insert(2, floatNotEmpty, 9.9999F), new float[] {1.1F, 2.1F, 9.9999F, 3.1F, 4.1F});
+        assertArrayEquals(ArrayUtils.insert(floatNotEmpty, 9.9999F, 10F, 0.001F), new float[] {9.9999F, 10F, 0.001F, 1.1F, 2.1F, 3.1F, 4.1F});
+
+        assertArrayEquals(ArrayUtils.insert(intEmpty, 9), new int[] {9});
+        assertArrayEquals(ArrayUtils.insert(intNotEmpty, 9), new int[] {9, 1, 2, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(2, intNotEmpty, 9), new int[] {1, 2, 9, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(intNotEmpty, 9, 10), new int[] {9, 10, 1, 2, 3, 4});
+
+        assertArrayEquals(ArrayUtils.insert(longEmpty, 9), new long[] {9});
+        assertArrayEquals(ArrayUtils.insert(longNotEmpty, 9), new long[] {9, 1, 2, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(2, longNotEmpty, 9), new long[] {1, 2, 9, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(longNotEmpty, 9, 10), new long[] {9, 10, 1, 2, 3, 4});
+
+        assertArrayEquals(ArrayUtils.insert(shortEmpty, (short) 9), new short[] {9});
+        assertArrayEquals(ArrayUtils.insert(shortNotEmpty, (short) 9), new short[] {9, 1, 2, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(2, shortNotEmpty, (short) 9), new short[] {1, 2, 9, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(shortNotEmpty, (short) 9, (short) 10), new short[] {9, 10, 1, 2, 3, 4});
+
+        assertArrayEquals(ArrayUtils.insert(stringEmpty, "test"), new String[] {"test"});
+        assertArrayEquals(ArrayUtils.insert(stringNotEmpty, "test"), new String[] {"test", "abc", "def", "ghi", "jkl"});
+        assertArrayEquals(ArrayUtils.insert(2, stringNotEmpty, "test"), new String[] {"abc", "def", "test", "ghi", "jkl"});
+        assertArrayEquals(ArrayUtils.insert(stringNotEmpty, "test", "test2"), new String[] {"test", "test2", "abc", "def", "ghi", "jkl"});
+
+        assertArrayEquals(ArrayUtils.insert(integerEmpty, 9), new Integer[] {9});
+        assertArrayEquals(ArrayUtils.insert(integerNotEmpty, 9), new Integer[] {9, 1, 2, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(2, integerNotEmpty, 9), new Integer[] {1, 2, 9, 3, 4});
+        assertArrayEquals(ArrayUtils.insert(integerNotEmpty, 9, 10, 11), new Integer[] {9, 10, 11, 1, 2, 3, 4});
+
+        assertArrayEquals(ArrayUtils.insert(intArrEmpty, new int[] {9}), new int[][] {{9}});
+        assertArrayEquals(ArrayUtils.insert(intArrNotEmpty, new int[] {9}), new int[][] {{9}, {1, 2, 3}, {4, 5}});
+        assertArrayEquals(ArrayUtils.insert(2, intArrNotEmpty, new int[] {9}), new int[][] {{1, 2, 3}, {4, 5}, {9}});
+        assertArrayEquals(ArrayUtils.insert(intArrNotEmpty, new int[] {9}, new int[] {9}), new int[][] {{9}, {9}, {1, 2, 3}, {4, 5}});
     }
 
 }
