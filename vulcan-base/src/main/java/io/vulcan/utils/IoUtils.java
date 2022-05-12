@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import javax.annotation.WillClose;
+import javax.annotation.WillNotClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,7 @@ public final class IoUtils {
     private static final int BUFFER_SIZE = 1024 * 4;
     private static final Logger log = LoggerFactory.getLogger(IoUtils.class);
 
-    public static byte[] toByteArray(InputStream is) throws IOException {
+    public static byte[] toByteArray(@WillNotClose InputStream is) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] b = new byte[BUFFER_SIZE];
             int n;
@@ -27,15 +29,15 @@ public final class IoUtils {
         }
     }
 
-    public static String toString(InputStream is, Charset charset) throws IOException {
+    public static String toString(@WillNotClose InputStream is, Charset charset) throws IOException {
         return new String(toByteArray(is), charset);
     }
 
-    public static String toUtf8String(InputStream is) throws IOException {
+    public static String toUtf8String(@WillNotClose InputStream is) throws IOException {
         return toString(is, StandardCharsets.UTF_8);
     }
 
-    public static long copy(InputStream in, OutputStream out, long readLimit) throws IOException {
+    public static long copy(@WillNotClose InputStream in, @WillNotClose OutputStream out, long readLimit) throws IOException {
         if (in instanceof FileInputStream && out instanceof FileOutputStream) {
             final FileChannel fis = ((FileInputStream) in).getChannel();
             final FileChannel fos = ((FileOutputStream) out).getChannel();
@@ -59,11 +61,11 @@ public final class IoUtils {
         return count;
     }
 
-    public static long copy(InputStream in, OutputStream out) throws IOException {
+    public static long copy(@WillNotClose InputStream in, @WillNotClose OutputStream out) throws IOException {
         return copy(in, out, Long.MAX_VALUE);
     }
 
-    public static void closeQuietly(AutoCloseable is) {
+    public static void closeQuietly(@WillClose AutoCloseable is) {
         if (is != null) {
             try {
                 is.close();
