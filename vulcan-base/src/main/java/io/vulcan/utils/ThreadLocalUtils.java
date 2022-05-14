@@ -11,7 +11,7 @@ public final class ThreadLocalUtils {
 
     private static final InheritableThreadLocal<Map<Object, Object>> threadBucket = new InheritableThreadLocalMap<>();
 
-    static <T> T getValue(InheritableThreadLocal<Map<Object, Object>> threadBucket, Object key, Class<T> clazz) {
+    static <T> T getValue(final InheritableThreadLocal<Map<Object, Object>> threadBucket, final Object key, final Class<T> clazz) {
         final Map<?, ?> bucket = threadBucket.get();
         if (null == bucket) {
             if (log.isWarnEnabled()) {
@@ -35,7 +35,7 @@ public final class ThreadLocalUtils {
         }
     }
 
-    static Object setValue(InheritableThreadLocal<Map<Object, Object>> threadBucket, Object key, Object value) {
+    static Object setValue(final InheritableThreadLocal<Map<Object, Object>> threadBucket, final Object key, final Object value) {
         Map<Object, Object> bucket = threadBucket.get();
         if (null == bucket) {
             final Map<Object, Object> newBucket = new HashMap<>();
@@ -45,7 +45,7 @@ public final class ThreadLocalUtils {
         return bucket.put(key, value);
     }
 
-    static Object remove(InheritableThreadLocal<Map<Object, Object>> threadBucket, Object key) {
+    static Object remove(final InheritableThreadLocal<Map<Object, Object>> threadBucket, final Object key) {
         final Map<Object, Object> bucket = threadBucket.get();
         if (null == bucket) {
             return null;
@@ -53,22 +53,22 @@ public final class ThreadLocalUtils {
         return bucket.remove(key);
     }
 
-    public static <T> T getValue(Object key, Class<T> clazz) {
+    public static <T> T getValue(final Object key, final Class<T> clazz) {
         return getValue(threadBucket, key, clazz);
     }
 
-    public static Object setValue(Object key, Object value) {
+    public static Object setValue(final Object key, final Object value) {
         return setValue(threadBucket, key, value);
     }
 
-    public static Object remove(Object key) {
+    public static Object remove(final Object key) {
         return remove(threadBucket, key);
     }
 
     private static class InheritableThreadLocalMap<K, V> extends InheritableThreadLocal<Map<K, V>> {
 
         @Override
-        protected Map<K, V> childValue(Map<K, V> parentValue) {
+        protected Map<K, V> childValue(final Map<K, V> parentValue) {
             if (parentValue != null) {
                 return new HashMap<>(parentValue);
             } else {
