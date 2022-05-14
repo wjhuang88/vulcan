@@ -9,12 +9,20 @@ public final class StringUtils {
         return null != text && !text.isEmpty();
     }
 
+    public static boolean isNullOrEmpty(final String text) {
+        return null == text || text.isEmpty();
+    }
+
     public static String join(final String... phrases) {
         return joinOn(",").join(phrases);
     }
 
     public static String join(final Collection<String> phrases) {
         return joinOn(",").join(phrases);
+    }
+
+    public static String join(final String delimiter, final Collection<String> phrases) {
+        return joinOn(delimiter).join(phrases);
     }
 
     public static Joiner joinOn(final String delimiter) {
