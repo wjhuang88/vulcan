@@ -54,7 +54,7 @@ class BeanTest {
     private static final TestBeanChild bean = new TestBeanChild();
 
     @BeforeAll
-    static void setUp() throws Exception {
+    static void setUp() {
         bean.setFieldA("field-a");
         bean.setFieldB("field-b");
         bean.setFieldC("field-c");
@@ -63,7 +63,7 @@ class BeanTest {
     }
 
     @Test
-    public void beanToBeanTest() throws Exception {
+    public void beanToBeanTest() {
 
         TestBeanDist dist = beanManager.beanToBean(bean, TestBeanDist.class);
         assertNotNull(dist);
@@ -165,7 +165,7 @@ class BeanTest {
     }
 
     @Test
-    public void mapToBeanTest() throws Exception {
+    public void mapToBeanTest() {
         Map<String, Object> testMap = new HashMap<>();
         Date now = new Date();
         testMap.put("fieldDate", now);

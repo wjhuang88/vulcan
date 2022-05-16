@@ -4,14 +4,16 @@ plugins {
 
 dependencies {
     constraints {
-        api 'com.github.ben-manes.caffeine:caffeine:2.8.8'
-        api 'net.bytebuddy:byte-buddy:1.11.18'
-        api 'org.slf4j:slf4j-api:1.7.32'
+        api 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+        api 'net.bytebuddy:byte-buddy:1.12.10'
+        api 'org.slf4j:slf4j-api:1.7.36'
         api 'commons-beanutils:commons-beanutils:1.9.4'
-        api "com.google.code.findbugs:jsr305:3.0.2"
+        api 'com.google.code.findbugs:jsr305:3.0.2'
+        api 'io.projectreactor:reactor-core:3.4.18'
 
         api 'com.caucho:hessian:4.0.65'
-        api 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-        api 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+        api 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        api 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        api 'io.vertx:vertx-junit5:4.3.0'
     }
 }

@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-description 'vulcan basic toolset'
+description 'vulcan async toolset'
 
 java {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -12,9 +12,9 @@ java {
 dependencies {
     api project(":vulcan-api")
 
-    api 'org.slf4j:slf4j-api'
-    api "com.google.code.findbugs:jsr305"
+    api 'io.projectreactor:reactor-core'
 
+    testImplementation 'io.vertx:vertx-junit5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
