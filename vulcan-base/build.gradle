@@ -13,6 +13,7 @@ dependencies {
     api project(":vulcan-api")
 
     api 'org.slf4j:slf4j-api'
+    api 'com.alibaba:fastjson'
     api "com.google.code.findbugs:jsr305"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api'

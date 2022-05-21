@@ -160,7 +160,8 @@ public class AsyncManagerTest {
         System.out.println("main thread: " + currentThread.getName());
         VertxTestContext testContext = new VertxTestContext();
 
-        asyncManager.future(() -> {
+        @SuppressWarnings("unused")
+        Future<Void> future = asyncManager.future(() -> {
             Thread innerThread = Thread.currentThread();
             System.out.println("inner thread: " + innerThread.getName());
             Assertions.assertNotEquals(currentThread.getId(), innerThread.getId());

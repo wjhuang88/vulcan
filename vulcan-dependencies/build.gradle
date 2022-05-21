@@ -5,11 +5,14 @@ plugins {
 dependencies {
     constraints {
         api 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+        api 'org.msgpack:msgpack-core:0.9.1'
+        api 'com.alibaba:fastjson:2.0.3'
         api 'net.bytebuddy:byte-buddy:1.12.10'
         api 'org.slf4j:slf4j-api:1.7.36'
         api 'commons-beanutils:commons-beanutils:1.9.4'
         api 'com.google.code.findbugs:jsr305:3.0.2'
         api 'io.projectreactor:reactor-core:3.4.18'
+        api 'com.lmax:disruptor:3.4.4'
 
         api 'com.caucho:hessian:4.0.65'
         api 'org.junit.jupiter:junit-jupiter-api:5.8.2'

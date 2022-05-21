@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+}
+
+description 'vulcan eventbus'
+
+dependencies {
+    api project(":vulcan-base")
+    api 'org.slf4j:slf4j-api'
+    api 'com.lmax:disruptor'
+
+    testImplementation 'io.vertx:vertx-junit5'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+}
