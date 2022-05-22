@@ -16,6 +16,7 @@ dependencies {
     api 'com.alibaba:fastjson'
     api "com.google.code.findbugs:jsr305"
 
+    testImplementation 'io.vertx:vertx-junit5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
