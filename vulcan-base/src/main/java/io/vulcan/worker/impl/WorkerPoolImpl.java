@@ -34,25 +34,38 @@ public class WorkerPoolImpl implements WorkerPool {
 
     @Override
     public void execute(Runnable runnable, Callback<Void, Throwable> callback) {
-        executor.execute(() -> {
-            try {
-                runnable.run();
-                callback.onSuccess(null);
-            } catch (Throwable t) {
-                callback.onException(t);
-            }
-        });
+        try {
+            executor.execute(() -> {
+                try {
+                    runnable.run();
+                    callback.onSuccess(null);
+                } catch (Throwable t) {
+                    callback.onException(t);
+                }
+            });
+        } catch (Throwable t) {
+            callback.onException(t);
+        }
     }
 
     @Override
     public <R> void execute(Callable<R> callable, Callback<R, Throwable> callback) {
-        executor.execute(() -> {
-            try {
-                R result = callable.call();
-                callback.onSuccess(result);
-            } catch (Throwable t) {
-                callback.onException(t);
-            }
-        });
+        try {
+            executor.execute(() -> {
+                try {
+                    R result = callable.call();
+                    callback.onSuccess(result);
+                } catch (Throwable t) {
+                    callback.onException(t);
+                }
+            });
+        } catch (Throwable t) {
+            callback.onException(t);
+        }
+    }
+
+    @Override
+    public void close() {
+        executor.shutdown();
     }
 }

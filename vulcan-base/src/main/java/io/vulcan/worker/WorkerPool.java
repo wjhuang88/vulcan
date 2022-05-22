@@ -6,7 +6,7 @@ import io.vulcan.api.base.functional.Runnable;
 import io.vulcan.worker.impl.WorkerPoolImpl;
 import java.util.concurrent.Executor;
 
-public interface WorkerPool {
+public interface WorkerPool extends AutoCloseable {
 
     class Holder {
         private final static WorkerPool INSTANCE = new WorkerPoolImpl();
