@@ -1,4 +1,4 @@
-package io.vulcan.eventbus.impl.strategy;
+package io.vulcan.eventbus.impl;
 
 import io.vulcan.api.eventbus.ConsumerHandler;
 import io.vulcan.api.eventbus.ErrorHandler;

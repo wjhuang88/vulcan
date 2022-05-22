@@ -1,4 +1,4 @@
-package io.vulcan.eventbus.impl.strategy;
+package io.vulcan.eventbus.impl;
 
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
@@ -9,6 +9,7 @@ import io.vulcan.api.eventbus.ErrorHandler;
 import io.vulcan.api.eventbus.EventStrategy;
 import io.vulcan.utils.JsonUtils;
 import io.vulcan.utils.StringUtils;
+import io.vulcan.worker.WorkerPool;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,10 +31,11 @@ public class LocalEventStrategy implements EventStrategy {
     private final ConcurrentMap<String, LocalConsumerMeta<?>> consumerMap = new ConcurrentHashMap<>();
     private final Set<Actions> actions = EnumSet.of(Actions.SEND, Actions.CONSUME);
 
+    @SuppressWarnings("deprecation")
     private final Disruptor<BytesEvent> disruptor = new Disruptor<>(BytesEvent::new, BUFFER_SIZE,
-            DaemonThreadFactory.INSTANCE);
+            WorkerPool.getInstance().executor());
 
-    public LocalEventStrategy() {
+    LocalEventStrategy() {
         disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
             if (null == event || StringUtils.isNullOrEmpty(event.getRouter())) {
                 return;

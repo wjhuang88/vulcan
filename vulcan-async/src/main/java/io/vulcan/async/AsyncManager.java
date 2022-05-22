@@ -92,7 +92,7 @@ public class AsyncManager {
             try {
                 T result = callable.call();
                 completableFuture.complete(result);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 completableFuture.completeExceptionally(e);
             }
         });

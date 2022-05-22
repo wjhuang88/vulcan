@@ -5,7 +5,6 @@ import io.vulcan.api.eventbus.Actions;
 import io.vulcan.api.eventbus.ConsumerHandler;
 import io.vulcan.api.eventbus.EventStrategy;
 import io.vulcan.eventbus.EventBus;
-import io.vulcan.eventbus.impl.strategy.LocalEventStrategy;
 import io.vulcan.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;

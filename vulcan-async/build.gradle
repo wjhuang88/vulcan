@@ -10,7 +10,7 @@ java {
 }
 
 dependencies {
-    api project(":vulcan-api")
+    api project(":vulcan-base")
 
     api 'io.projectreactor:reactor-core'
 
