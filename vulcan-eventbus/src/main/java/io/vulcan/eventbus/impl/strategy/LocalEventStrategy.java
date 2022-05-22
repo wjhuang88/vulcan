@@ -1,4 +1,4 @@
-package io.vulcan.eventbus.strategy;
+package io.vulcan.eventbus.impl.strategy;
 
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;

@@ -1,4 +1,4 @@
-package io.vulcan.eventbus.strategy;
+package io.vulcan.eventbus.impl.strategy;
 
 public class BytesEvent {
     private byte[] data;

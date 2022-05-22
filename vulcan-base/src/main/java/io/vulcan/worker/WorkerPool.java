@@ -1,14 +1,14 @@
 package io.vulcan.worker;
 
-public final class WorkerPool {
+import io.vulcan.worker.impl.WorkerPoolImpl;
 
-    private WorkerPool() {}
+public interface WorkerPool {
 
-    private static class Holder {
-        private final static WorkerPool INSTANCE = new WorkerPool();
+    class Holder {
+        private final static WorkerPool INSTANCE = new WorkerPoolImpl();
     }
 
-    public static WorkerPool getInstance() {
+    static WorkerPool getInstance() {
         return Holder.INSTANCE;
     }
 

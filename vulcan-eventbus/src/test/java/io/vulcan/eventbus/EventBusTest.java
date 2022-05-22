@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 class EventBusTest {
 
-    EventBus eventBus = new EventBus();
+    EventBus eventBus = EventBus.create();
 
     static Map<String, String> testMap = new HashMap<>();
     static List<String> testList = new ArrayList<>();
