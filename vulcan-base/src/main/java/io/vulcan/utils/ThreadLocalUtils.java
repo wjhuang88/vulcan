@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 public final class ThreadLocalUtils {
 
+    private ThreadLocalUtils() {}
+
     private static final Logger log = LoggerFactory.getLogger(ThreadLocalUtils.class);
 
     private static final InheritableThreadLocal<Map<Object, Object>> threadBucket = new InheritableThreadLocalMap<>();

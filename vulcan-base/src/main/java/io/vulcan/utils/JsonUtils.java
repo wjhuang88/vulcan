@@ -6,6 +6,8 @@ import java.util.List;
 
 public final class JsonUtils {
 
+    private JsonUtils() {}
+
     @SuppressWarnings("unused")
     private static <T> TypeReference<List<T>> makeListType(Class<T> clazz) {
         return new TypeReference<List<T>>(){};

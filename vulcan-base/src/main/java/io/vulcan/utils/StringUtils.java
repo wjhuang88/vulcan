@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 public final class StringUtils {
 
+    private StringUtils() {}
+
     public static boolean hasLength(final String text) {
         return null != text && !text.isEmpty();
     }

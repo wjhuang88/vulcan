@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 
 public final class AssertUtils {
+
+    private AssertUtils() {}
+
     public static void state(boolean expression, String message) {
         if (!expression) {
             throw new IllegalStateException(message);

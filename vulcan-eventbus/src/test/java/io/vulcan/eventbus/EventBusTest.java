@@ -45,7 +45,7 @@ class EventBusTest {
 
         VertxTestContext testContext = new VertxTestContext();
         eventBus.listen("test-string", String.class, value -> {
-            System.out.println("router: test-string");
+            System.out.println("router: test-string, thread: " + Thread.currentThread());
             assertEquals("test", value);
             testContext.failNow("Should not run here");
         });
@@ -63,7 +63,7 @@ class EventBusTest {
     void testString() throws Throwable {
         VertxTestContext testContext = new VertxTestContext();
         eventBus.listen("test-string", String.class, value -> {
-            System.out.println("router: test-string");
+            System.out.println("router: test-string, thread: " + Thread.currentThread());
             assertEquals("test", value);
             testContext.completeNow();
         });
@@ -80,7 +80,7 @@ class EventBusTest {
     void listenAndSend() throws Throwable {
         VertxTestContext testContext = new VertxTestContext();
         eventBus.listen("local://test-local", List.class, list -> {
-            System.out.println("router: local://test-local");
+            System.out.println("router: local://test-local, thread: " + Thread.currentThread());
             assertEquals("l1", list.get(0));
             assertEquals("l2", list.get(1));
             assertEquals("l3", list.get(2));
@@ -102,7 +102,7 @@ class EventBusTest {
     void listenAndSendNoSchema() throws Throwable {
         VertxTestContext testContext = new VertxTestContext();
         eventBus.listen("test-local-no-schema", Map.class, map -> {
-            System.out.println("router: test-local-no-schema");
+            System.out.println("router: test-local-no-schema, thread: " + Thread.currentThread());
             assertEquals("v1", map.get("k1"));
             assertEquals("v2", map.get("k2"));
             assertEquals("v3", map.get("k3"));
@@ -122,7 +122,7 @@ class EventBusTest {
     void listenAndSendObject() throws Throwable {
         VertxTestContext testContext = new VertxTestContext();
         eventBus.listen("test-local-object", TestData.class, data -> {
-            System.out.println("router: test-local-object");
+            System.out.println("router: test-local-object, thread: " + Thread.currentThread());
             assertEquals(99, data.getLongValue());
             assertEquals("o1", data.getStringValue());
             testContext.completeNow();

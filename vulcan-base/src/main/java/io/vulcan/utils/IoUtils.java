@@ -15,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class IoUtils {
+
+    private IoUtils() {}
+
     private static final int BUFFER_SIZE = 1024 * 4;
     private static final Logger log = LoggerFactory.getLogger(IoUtils.class);
 

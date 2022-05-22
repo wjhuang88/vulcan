@@ -2,7 +2,9 @@ package io.vulcan.utils;
 
 import java.lang.reflect.Array;
 
-public class ArrayUtils {
+public final class ArrayUtils {
+
+    private ArrayUtils() {}
 
     public static int getLength(final Object array) {
         if (null == array) {
