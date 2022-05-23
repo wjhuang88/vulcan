@@ -15,16 +15,31 @@ public class WorkerPoolImpl implements WorkerPool {
 
     private final ThreadPoolExecutor executor;
 
+    private final CallbackPolicy callbackPolicy;
+
     public WorkerPoolImpl() {
-        executor = new ThreadPoolExecutor(
-                CORES,
-                CORES * 5,
-                60L,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(200),
+        this(CORES, CORES * 5, 60L, TimeUnit.SECONDS, 200);
+    }
+
+    public WorkerPoolImpl(int coreSize, int maxSize, long keepAlive, TimeUnit unit, int queueSize) {
+        this.callbackPolicy = new CallbackPolicy();
+        this.executor = new ThreadPoolExecutor(
+                coreSize,
+                maxSize,
+                keepAlive,
+                unit,
+                new LinkedBlockingQueue<>(queueSize),
                 new WorkerThreadFactory(),
-                new ThreadPoolExecutor.AbortPolicy()
+                this.callbackPolicy
         );
+    }
+
+    public void onRejected(RunnableHandler handler) {
+        callbackPolicy.setRunnableHandler(handler);
+    }
+
+    public void onRejected(CallableHandler handler) {
+        callbackPolicy.setCallableHandler(handler);
     }
 
     @Override
@@ -35,14 +50,7 @@ public class WorkerPoolImpl implements WorkerPool {
     @Override
     public void execute(Runnable runnable, Callback<Void, Throwable> callback) {
         try {
-            executor.execute(() -> {
-                try {
-                    runnable.run();
-                    callback.onSuccess(null);
-                } catch (Throwable t) {
-                    callback.onException(t);
-                }
-            });
+            executor.execute(new RunnableWrapper(runnable, callback));
         } catch (Throwable t) {
             callback.onException(t);
         }
@@ -51,14 +59,7 @@ public class WorkerPoolImpl implements WorkerPool {
     @Override
     public <R> void execute(Callable<R> callable, Callback<R, Throwable> callback) {
         try {
-            executor.execute(() -> {
-                try {
-                    R result = callable.call();
-                    callback.onSuccess(result);
-                } catch (Throwable t) {
-                    callback.onException(t);
-                }
-            });
+            executor.execute(new CallableWrapper<>(callable, callback));
         } catch (Throwable t) {
             callback.onException(t);
         }
