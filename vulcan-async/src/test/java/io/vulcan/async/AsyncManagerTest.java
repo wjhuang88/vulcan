@@ -3,12 +3,9 @@ package io.vulcan.async;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vulcan.api.base.functional.Callable;
-import io.vulcan.worker.WorkerPool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
@@ -18,12 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(VertxExtension.class)
 public class AsyncManagerTest {
 
-    final Executor executor;
     final AsyncManager asyncManager;
 
     AsyncManagerTest() {
-        executor = WorkerPool.getInstance().executor();
-        asyncManager = new AsyncManager(executor);
+        asyncManager = AsyncManager.getInstance();
     }
 
     @Test
@@ -92,21 +87,6 @@ public class AsyncManagerTest {
         List<String> block = asyncManager.runMultiple(taskList).collectList().block();
         Assertions.assertNotNull(block);
         Assertions.assertArrayEquals(new String[]{"async_result1", "async_result2", "async_result3"}, block.toArray(new String[0]));
-
-        List<String> block2 = asyncManager.runMultiple(() -> {
-            Thread innerThread = Thread.currentThread();
-            System.out.println("inner thread1: " + innerThread.getName());
-            Assertions.assertNotEquals(currentThread.getId(), innerThread.getId());
-            return "async_result4";
-        }, () -> {
-            Thread innerThread = Thread.currentThread();
-            System.out.println("inner thread1: " + innerThread.getName());
-            Assertions.assertNotEquals(currentThread.getId(), innerThread.getId());
-            return "async_result5";
-        }).collectList().block();
-
-        Assertions.assertNotNull(block2);
-        Assertions.assertArrayEquals(new String[]{"async_result4", "async_result5"}, block2.toArray(new String[0]));
     }
 
     @Test

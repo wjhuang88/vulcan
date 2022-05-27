@@ -3,6 +3,7 @@ package io.vulcan.worker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vulcan.api.base.functional.Callback;
 import io.vulcan.worker.WorkerPool.CallableHandler;
@@ -12,7 +13,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(VertxExtension.class)
 class WorkerPoolTest {
 
     WorkerPool pool = WorkerPool.getInstance();
