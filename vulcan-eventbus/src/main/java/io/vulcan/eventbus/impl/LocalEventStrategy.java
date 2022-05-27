@@ -1,7 +1,6 @@
 package io.vulcan.eventbus.impl;
 
 import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
 import io.vulcan.api.base.functional.Callback;
 import io.vulcan.api.eventbus.Actions;
 import io.vulcan.api.eventbus.ConsumerHandler;

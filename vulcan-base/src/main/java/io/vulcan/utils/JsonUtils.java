@@ -8,11 +8,6 @@ public final class JsonUtils {
 
     private JsonUtils() {}
 
-    @SuppressWarnings("unused")
-    private static <T> TypeReference<List<T>> makeListType(Class<T> clazz) {
-        return new TypeReference<List<T>>(){};
-    }
-
     public static <T> String encode(T src) {
         return JSON.toJSONString(src);
     }
@@ -30,7 +25,7 @@ public final class JsonUtils {
     }
 
     public static <T> List<T> decodeToList(String src, Class<T> clazz) {
-        return JSON.parseObject(src, makeListType(clazz));
+        return JSON.parseArray(src, clazz);
     }
 
     public static <T> T decode(byte[] src, Class<T> clazz) {
@@ -42,6 +37,6 @@ public final class JsonUtils {
     }
 
     public static <T> List<T> decodeToList(byte[] src, Class<T> clazz) {
-        return makeListType(clazz).parseObject(src);
+        return JSON.parseArray(src, clazz);
     }
 }

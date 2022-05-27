@@ -2,6 +2,7 @@ package io.vulcan.worker.impl;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
 
 public class WorkerThreadFactory implements ThreadFactory {
 
@@ -16,7 +17,7 @@ public class WorkerThreadFactory implements ThreadFactory {
         namePrefix = "vulcan-worker-";
     }
 
-    public Thread newThread(Runnable r) {
+    public Thread newThread(@Nonnull Runnable r) {
         Thread t = new Thread(group, r,
                 namePrefix + threadNumber.getAndIncrement(),
                 0);

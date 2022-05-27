@@ -3,6 +3,7 @@ package io.vulcan.async;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vulcan.api.base.functional.Callable;
+import io.vulcan.worker.WorkerPool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -21,7 +22,7 @@ public class AsyncManagerTest {
     final AsyncManager asyncManager;
 
     AsyncManagerTest() {
-        executor = ForkJoinPool.commonPool();
+        executor = WorkerPool.getInstance().executor();
         asyncManager = new AsyncManager(executor);
     }
 
