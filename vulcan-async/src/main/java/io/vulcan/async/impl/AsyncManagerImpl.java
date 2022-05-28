@@ -1,21 +1,22 @@
 package io.vulcan.async.impl;
 
 import io.vulcan.api.base.functional.Callable;
+import io.vulcan.api.base.functional.Callback;
 import io.vulcan.async.AsyncManager;
+import io.vulcan.worker.WorkerPool;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class AsyncManagerImpl implements AsyncManager {
 
-    private final Executor executor;
+    private final WorkerPool workerPool;
 
-    public AsyncManagerImpl(Executor executor) {
-        this.executor = executor;
+    public AsyncManagerImpl(WorkerPool workerPool) {
+        this.workerPool = workerPool;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class AsyncManagerImpl implements AsyncManager {
             final int size = callables.size();
 
             @SuppressWarnings("rawtypes")
-            CompletableFuture[] futureArr = new CompletableFuture[size];
+            final CompletableFuture[] futureArr = new CompletableFuture[size];
 
             int i = 0;
             for (Callable<T> callable : callables) {
@@ -67,13 +68,16 @@ public class AsyncManagerImpl implements AsyncManager {
 
     @Override
     public <T> CompletionStage<T> stage(Callable<T> callable) {
-        CompletableFuture<T> completableFuture = new CompletableFuture<>();
-        executor.execute(() -> {
-            try {
-                T result = callable.call();
-                completableFuture.complete(result);
-            } catch (Throwable e) {
-                completableFuture.completeExceptionally(e);
+        final CompletableFuture<T> completableFuture = new CompletableFuture<>();
+        workerPool.execute(callable, new Callback<T, Throwable>() {
+            @Override
+            public void onSuccess(T sendResult) {
+                completableFuture.complete(sendResult);
+            }
+
+            @Override
+            public void onException(Throwable throwable) {
+                completableFuture.completeExceptionally(throwable);
             }
         });
         return completableFuture;
@@ -81,13 +85,16 @@ public class AsyncManagerImpl implements AsyncManager {
 
     @Override
     public CompletionStage<Void> stage(Runnable runnable) {
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-        executor.execute(() -> {
-            try {
-                runnable.run();
+        final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+        workerPool.execute(runnable::run, new Callback<Void, Throwable>() {
+            @Override
+            public void onSuccess(Void sendResult) {
                 completableFuture.complete(null);
-            } catch (Exception e) {
-                completableFuture.completeExceptionally(e);
+            }
+
+            @Override
+            public void onException(Throwable throwable) {
+                completableFuture.completeExceptionally(throwable);
             }
         });
         return completableFuture;

@@ -5,4 +5,5 @@ include 'vulcan-api'
 include 'vulcan-base'
 include 'vulcan-async'
 include 'vulcan-eventbus'
+include 'vulcan-task'
 

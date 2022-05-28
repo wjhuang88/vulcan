@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public interface AsyncManager {
 
     class Holder {
-        private final static AsyncManagerImpl INSTANCE = new AsyncManagerImpl(WorkerPool.getInstance().executor());
+        private final static AsyncManagerImpl INSTANCE = new AsyncManagerImpl(WorkerPool.getInstance());
     }
 
     static AsyncManager getInstance() {
