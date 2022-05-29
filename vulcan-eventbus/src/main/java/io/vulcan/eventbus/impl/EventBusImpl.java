@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
 /**
@@ -23,8 +24,11 @@ public final class EventBusImpl implements EventBus {
 
     private static final String LOCAL_SCHEMA = "local";
 
+    private final AtomicBoolean closed = new AtomicBoolean();
+
     public EventBusImpl() {
         registerEventStrategy(LOCAL_SCHEMA, new LocalEventStrategy());
+        closed.getAndSet(false);
     }
 
     private final Map<String, EventStrategy> strategyRouter = new HashMap<>();
@@ -36,6 +40,7 @@ public final class EventBusImpl implements EventBus {
 
     @Override
     public <T> void listen(final String router, final Class<T> clazz, final ConsumerHandler<T> handler) {
+        checkClosed();
         final StrategyMeta meta = checkAndGetStrategy(router);
         if (!meta.strategy.supportedActions().contains(Actions.CONSUME)) {
             throw new RuntimeException("Cannot register message handler through channel <" + meta.schema + ">, operation not supported");
@@ -45,6 +50,7 @@ public final class EventBusImpl implements EventBus {
 
     @Override
     public <T> Future<T> send(final String router, final Class<T> clazz, final T payload) {
+        checkClosed();
         CompletableFuture<T> future = new CompletableFuture<>();
         Callback<T, Throwable> callback = new Callback<T, Throwable>() {
             @Override
@@ -63,6 +69,7 @@ public final class EventBusImpl implements EventBus {
 
     @Override
     public <T> void send(final String router, final Class<T> clazz, final T payload, Callback<T, Throwable> callback) {
+        checkClosed();
         final StrategyMeta meta = checkAndGetStrategy(router);
         if (!meta.strategy.supportedActions().contains(Actions.SEND)) {
             throw new RuntimeException("Cannot send message through channel <" + meta.schema + ">, operation not supported");
@@ -72,6 +79,7 @@ public final class EventBusImpl implements EventBus {
 
     @Override
     public <T> Future<T> publish(final String router, final Class<T> clazz, final T payload) {
+        checkClosed();
         CompletableFuture<T> future = new CompletableFuture<>();
         Callback<T, Throwable> callback = new Callback<T, Throwable>() {
             @Override
@@ -90,6 +98,7 @@ public final class EventBusImpl implements EventBus {
 
     @Override
     public <T> void publish(final String router, final Class<T> clazz, final T payload, Callback<T, Throwable> callback) {
+        checkClosed();
         final StrategyMeta meta = checkAndGetStrategy(router);
         if (!meta.strategy.supportedActions().contains(Actions.PUBLISH)) {
             throw new RuntimeException("Cannot publish message through channel <" + meta.schema + ">, operation not supported");
@@ -109,6 +118,13 @@ public final class EventBusImpl implements EventBus {
     public void close() throws Exception {
         for (EventStrategy strategy : strategyRouter.values()) {
             strategy.close();
+        }
+        closed.getAndSet(true);
+    }
+
+    void checkClosed() {
+        if (closed.get()) {
+            throw new IllegalStateException("EventBus instance is closed");
         }
     }
 

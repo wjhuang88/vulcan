@@ -13,8 +13,12 @@ import java.util.concurrent.Future;
  */
 public interface EventBus extends AutoCloseable {
 
-    static EventBus create() {
-        return new EventBusImpl();
+    class Holder {
+        private static final EventBusImpl INSTANCE = new EventBusImpl();
+    }
+
+    static EventBus getInstance() {
+        return Holder.INSTANCE;
     }
 
     /**

@@ -1,7 +1,9 @@
 package io.vulcan.eventbus;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,13 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(VertxExtension.class)
 class EventBusTest {
 
-    EventBus eventBus = EventBus.create();
+    static EventBus eventBus = EventBus.getInstance();
 
     static Map<String, String> testMap = new HashMap<>();
     static List<String> testList = new ArrayList<>();
@@ -36,39 +41,15 @@ class EventBusTest {
     }
 
     @Test
-    void basicTest() throws Throwable {
-        assertTrue(eventBus.hasSchema("local"));
-        assertThrows(RuntimeException.class, () -> {
-            Future<String> publish = eventBus.publish("test", String.class, "test");
-            assertNull(publish.get());
-        });
-
-        VertxTestContext testContext = new VertxTestContext();
-        eventBus.listen("test-string", String.class, value -> {
-            System.out.println("router: test-string, thread: " + Thread.currentThread());
-            assertEquals("test", value);
-            testContext.failNow("Should not run here");
-        });
-
-        eventBus.close();
-        eventBus.send("test-string", String.class, "test");
-
-        Assertions.assertFalse(testContext.awaitCompletion(5, TimeUnit.SECONDS));
-        if (testContext.failed()) {
-            throw testContext.causeOfFailure();
-        }
-    }
-
-    @Test
     void testString() throws Throwable {
         VertxTestContext testContext = new VertxTestContext();
-        eventBus.listen("test-string", String.class, value -> {
+        eventBus.listen("test-string-2", String.class, value -> {
             System.out.println("router: test-string, thread: " + Thread.currentThread());
             assertEquals("test", value);
             testContext.completeNow();
         });
 
-        eventBus.send("test-string", String.class, "test");
+        eventBus.send("test-string-2", String.class, "test");
 
         Assertions.assertTrue(testContext.awaitCompletion(5, TimeUnit.SECONDS));
         if (testContext.failed()) {
@@ -132,6 +113,30 @@ class EventBusTest {
         eventBus.send("test-local-object_no_listener", TestData.class, testObject);
 
         Assertions.assertTrue(testContext.awaitCompletion(5, TimeUnit.SECONDS));
+        if (testContext.failed()) {
+            throw testContext.causeOfFailure();
+        }
+    }
+
+    @AfterAll
+    static void basicTest() throws Throwable {
+        assertTrue(eventBus.hasSchema("local"));
+        assertThrows(RuntimeException.class, () -> {
+            Future<String> publish = eventBus.publish("test", String.class, "test");
+            assertNull(publish.get());
+        });
+
+        VertxTestContext testContext = new VertxTestContext();
+        eventBus.listen("test-string", String.class, value -> {
+            System.out.println("router: test-string, thread: " + Thread.currentThread());
+            assertEquals("test", value);
+            testContext.failNow("Should not run here");
+        });
+
+        eventBus.close();
+        assertThrows(IllegalStateException.class, () -> eventBus.send("test-string", String.class, "test"));
+
+        Assertions.assertFalse(testContext.awaitCompletion(5, TimeUnit.SECONDS));
         if (testContext.failed()) {
             throw testContext.causeOfFailure();
         }
