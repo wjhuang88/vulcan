@@ -38,6 +38,12 @@ public interface WorkerPool extends AutoCloseable {
 
     Executor executor();
 
+    int coreSize();
+
+    int maxSize();
+
+    int queueSize();
+
     void execute(Runnable runnable, Callback<Void, Throwable> callback);
 
     <R> void execute(Callable<R> callable, Callback<R, Throwable> callback);

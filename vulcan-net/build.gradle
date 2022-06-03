@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+}
+
+description 'vulcan net tools based on netty'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":vulcan-base")
+    api 'org.slf4j:slf4j-api'
+    api 'io.netty:netty-all'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+}
