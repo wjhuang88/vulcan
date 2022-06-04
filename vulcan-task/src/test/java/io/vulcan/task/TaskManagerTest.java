@@ -8,7 +8,7 @@ class TaskManagerTest {
     final TaskManager manager;
 
     TaskManagerTest() {
-        manager = TaskManager.getInstance();
+        manager = TaskManager.getDefault();
     }
 
     @Test

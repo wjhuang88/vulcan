@@ -30,11 +30,11 @@ public class LocalEventStrategy implements EventStrategy {
     private final ConcurrentMap<String, LocalConsumerMeta<?>> consumerMap = new ConcurrentHashMap<>();
     private final Set<Actions> actions = EnumSet.of(Actions.SEND, Actions.CONSUME);
 
-    @SuppressWarnings("deprecation")
-    private final Disruptor<BytesEvent> disruptor = new Disruptor<>(BytesEvent::new, BUFFER_SIZE,
-            WorkerPool.getInstance().executor());
+    private final Disruptor<BytesEvent> disruptor;
 
-    LocalEventStrategy() {
+    @SuppressWarnings("deprecation")
+    LocalEventStrategy(WorkerPool pool) {
+        disruptor = new Disruptor<>(BytesEvent::new, BUFFER_SIZE, pool.executor());
         disruptor.handleEventsWith((event, sequence, endOfBatch) -> {
             if (null == event || StringUtils.isNullOrEmpty(event.getRouter())) {
                 return;

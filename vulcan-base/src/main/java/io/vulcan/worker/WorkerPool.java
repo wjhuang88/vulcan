@@ -13,24 +13,47 @@ public interface WorkerPool extends AutoCloseable {
         private final static WorkerPoolImpl INSTANCE = new WorkerPoolImpl();
     }
 
-    static WorkerPool getInstance() {
+    static WorkerPool getDefault() {
         return Holder.INSTANCE;
     }
 
-    static WorkerPool getInstance(RunnableHandler runnableHandler) {
+    static WorkerPool getDefault(RunnableHandler runnableHandler) {
         final WorkerPoolImpl pool = Holder.INSTANCE;
         pool.onRejected(runnableHandler);
         return pool;
     }
 
-    static WorkerPool getInstance(CallableHandler callableHandler) {
+    static WorkerPool getDefault(CallableHandler callableHandler) {
         final WorkerPoolImpl pool = Holder.INSTANCE;
         pool.onRejected(callableHandler);
         return pool;
     }
 
-    static WorkerPool getInstance(RunnableHandler runnableHandler, CallableHandler callableHandler) {
+    static WorkerPool getDefault(RunnableHandler runnableHandler, CallableHandler callableHandler) {
         final WorkerPoolImpl pool = Holder.INSTANCE;
+        pool.onRejected(runnableHandler);
+        pool.onRejected(callableHandler);
+        return pool;
+    }
+
+    static WorkerPool create() {
+        return new WorkerPoolImpl();
+    }
+
+    static WorkerPool create(RunnableHandler runnableHandler) {
+        final WorkerPoolImpl pool = new WorkerPoolImpl();
+        pool.onRejected(runnableHandler);
+        return pool;
+    }
+
+    static WorkerPool create(CallableHandler callableHandler) {
+        final WorkerPoolImpl pool = new WorkerPoolImpl();
+        pool.onRejected(callableHandler);
+        return pool;
+    }
+
+    static WorkerPool create(RunnableHandler runnableHandler, CallableHandler callableHandler) {
+        final WorkerPoolImpl pool = new WorkerPoolImpl();
         pool.onRejected(runnableHandler);
         pool.onRejected(callableHandler);
         return pool;

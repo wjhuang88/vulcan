@@ -21,7 +21,7 @@ public class SocketServer {
     }
 
     public void start() throws InterruptedException {
-        final WorkerPool workerPool = WorkerPool.getInstance();
+        final WorkerPool workerPool = WorkerPool.getDefault();
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         final EventLoopGroup workerGroup = new NioEventLoopGroup(workerPool.maxSize(), workerPool.executor());
         try {

@@ -6,6 +6,7 @@ import io.vulcan.api.eventbus.ConsumerHandler;
 import io.vulcan.api.eventbus.EventStrategy;
 import io.vulcan.eventbus.EventBus;
 import io.vulcan.utils.StringUtils;
+import io.vulcan.worker.WorkerPool;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +28,12 @@ public final class EventBusImpl implements EventBus {
     private final AtomicBoolean closed = new AtomicBoolean();
 
     public EventBusImpl() {
-        registerEventStrategy(LOCAL_SCHEMA, new LocalEventStrategy());
+        registerEventStrategy(LOCAL_SCHEMA, new LocalEventStrategy(WorkerPool.getDefault()));
+        closed.getAndSet(false);
+    }
+
+    public EventBusImpl(WorkerPool pool) {
+        registerEventStrategy(LOCAL_SCHEMA, new LocalEventStrategy(pool));
         closed.getAndSet(false);
     }
 

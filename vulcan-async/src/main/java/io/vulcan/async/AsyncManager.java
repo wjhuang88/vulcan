@@ -12,11 +12,19 @@ import reactor.core.publisher.Mono;
 public interface AsyncManager {
 
     class Holder {
-        private final static AsyncManagerImpl INSTANCE = new AsyncManagerImpl(WorkerPool.getInstance());
+        private final static AsyncManagerImpl INSTANCE = new AsyncManagerImpl(WorkerPool.getDefault());
     }
 
-    static AsyncManager getInstance() {
+    static AsyncManager getDefault() {
         return Holder.INSTANCE;
+    }
+
+    static AsyncManager create() {
+        return new AsyncManagerImpl(WorkerPool.getDefault());
+    }
+
+    static AsyncManager create(WorkerPool pool) {
+        return new AsyncManagerImpl(pool);
     }
 
     <T> Mono<T> run(Callable<T> callable);

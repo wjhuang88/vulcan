@@ -10,11 +10,19 @@ import io.vulcan.worker.WorkerPool;
 public interface TaskManager {
 
     class Holder {
-        private final static TaskManagerImpl INSTANCE = new TaskManagerImpl(new LocalTaskStrategy(WorkerPool.getInstance()));
+        private final static TaskManagerImpl INSTANCE = new TaskManagerImpl(new LocalTaskStrategy(WorkerPool.getDefault()));
     }
 
-    static TaskManager getInstance() {
+    static TaskManager getDefault() {
         return Holder.INSTANCE;
+    }
+
+    static TaskManager create() {
+        return new TaskManagerImpl(new LocalTaskStrategy(WorkerPool.getDefault()));
+    }
+
+    static TaskManager create(WorkerPool pool) {
+        return new TaskManagerImpl(new LocalTaskStrategy(pool));
     }
 
     <R> Task<R> runTask(final Callable<R> task);

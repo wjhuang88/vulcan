@@ -18,7 +18,7 @@ public class AsyncManagerTest {
     final AsyncManager asyncManager;
 
     AsyncManagerTest() {
-        asyncManager = AsyncManager.getInstance();
+        asyncManager = AsyncManager.getDefault();
     }
 
     @Test

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(VertxExtension.class)
 class EventBusTest {
 
-    static EventBus eventBus = EventBus.getInstance();
+    static EventBus eventBus = EventBus.getDefault();
 
     static Map<String, String> testMap = new HashMap<>();
     static List<String> testList = new ArrayList<>();

@@ -4,6 +4,7 @@ import io.vulcan.api.base.functional.Callback;
 import io.vulcan.api.eventbus.ConsumerHandler;
 import io.vulcan.api.eventbus.EventStrategy;
 import io.vulcan.eventbus.impl.EventBusImpl;
+import io.vulcan.worker.WorkerPool;
 import java.util.concurrent.Future;
 
 /**
@@ -17,8 +18,16 @@ public interface EventBus extends AutoCloseable {
         private static final EventBusImpl INSTANCE = new EventBusImpl();
     }
 
-    static EventBus getInstance() {
+    static EventBus getDefault() {
         return Holder.INSTANCE;
+    }
+
+    static EventBus create() {
+        return new EventBusImpl();
+    }
+
+    static EventBus create(WorkerPool pool) {
+        return new EventBusImpl(pool);
     }
 
     /**
