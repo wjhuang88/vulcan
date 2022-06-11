@@ -9,26 +9,27 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.vulcan.net.echo.EchoHandler;
 import io.vulcan.worker.WorkerPool;
 import org.jetbrains.annotations.NotNull;
 
 public class SocketServer {
-    private final int port;
 
-    public SocketServer(int port) {
+    private final int port;
+    private final WorkerPool pool;
+
+    public SocketServer(int port, WorkerPool pool) {
         this.port = port;
+        this.pool = pool;
     }
 
-    public void start() throws InterruptedException {
-        final WorkerPool workerPool = WorkerPool.getDefault();
+    public void start(ChannelHandler... chs) throws InterruptedException {
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
-        final EventLoopGroup workerGroup = new NioEventLoopGroup(workerPool.maxSize(), workerPool.executor());
+        final EventLoopGroup workerGroup = new NioEventLoopGroup(pool.maxSize(), pool.executor());
         try {
             final ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(makeInitializer(new EchoHandler()))
+                    .childHandler(makeInitializer(chs))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             final ChannelFuture f = b.bind(port).sync();
