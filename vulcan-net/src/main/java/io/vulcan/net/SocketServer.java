@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 public class SocketServer {
 
     private final int port;
-    private final WorkerPool pool;
+    private final EventLoopGroup bossGroup;
+    private final EventLoopGroup workerGroup;
 
     public SocketServer(int port, WorkerPool pool) {
         this.port = port;
-        this.pool = pool;
+        this.bossGroup = new NioEventLoopGroup();
+        this.workerGroup = new NioEventLoopGroup(pool.maxSize(), pool.executor());
     }
 
     public void start(ChannelHandler... chs) throws InterruptedException {
-        final EventLoopGroup bossGroup = new NioEventLoopGroup();
-        final EventLoopGroup workerGroup = new NioEventLoopGroup(pool.maxSize(), pool.executor());
         try {
             final ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -40,6 +40,17 @@ public class SocketServer {
         }
     }
 
+    public CloseHandler startAsync(ChannelHandler... chs) {
+        final ServerBootstrap b = new ServerBootstrap();
+        b.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(makeInitializer(chs))
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true);
+        final ChannelFuture f = b.bind(port);
+        return new CloseHandler(f);
+    }
+
     private ChannelInitializer<SocketChannel> makeInitializer(ChannelHandler... chs) {
         if (null == chs || 0 == chs.length) {
             throw new IllegalArgumentException("Initializer channel handler is null");
@@ -52,12 +63,18 @@ public class SocketServer {
         };
     }
 
-//    public static void main(String[] args) throws Exception {
-//        int port = 8080;
-//        if (args.length > 0) {
-//            port = Integer.parseInt(args[0]);
-//        }
-//
-//        new SocketServer(port).start();
-//    }
+    public class CloseHandler implements AutoCloseable {
+        private final ChannelFuture f;
+        private
+        CloseHandler(ChannelFuture f) {
+            this.f = f;
+        }
+
+        @Override
+        public void close() throws InterruptedException {
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+            f.channel().closeFuture().sync();
+        }
+    }
 }
