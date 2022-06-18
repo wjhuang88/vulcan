@@ -6,34 +6,34 @@ import org.junit.jupiter.api.Test;
 
 class ArrayUtilsTest {
 
-    boolean[] booleanNotEmpty = new boolean[] {true, false, false, true};
+    boolean[] booleanNotEmpty = ArrayUtils.make(true, false, false, true);
     boolean[] booleanEmpty = new boolean[0];
 
-    byte[] byteNotEmpty = new byte[] {1, 2, 3, 4};
+    byte[] byteNotEmpty = ArrayUtils.make((byte)1, (byte)2, (byte)3, (byte)4);
     byte[] byteEmpty = new byte[0];
 
-    char[] charNotEmpty = new char[] {'a', 'b', 'c', 'd'};
+    char[] charNotEmpty = ArrayUtils.make('a', 'b', 'c', 'd');
     char[] charEmpty = new char[0];
 
-    double[] doubleNotEmpty = new double[] {1.1, 2.1, 3.1, 4.1};
+    double[] doubleNotEmpty = ArrayUtils.make(1.1, 2.1, 3.1, 4.1);
     double[] doubleEmpty = new double[0];
 
-    float[] floatNotEmpty = new float[] {1.1F, 2.1F, 3.1F, 4.1F};
+    float[] floatNotEmpty = ArrayUtils.make(1.1F, 2.1F, 3.1F, 4.1F);
     float[] floatEmpty = new float[0];
 
-    int[] intNotEmpty = new int[] {1, 2, 3, 4};
+    int[] intNotEmpty = ArrayUtils.make(1, 2, 3, 4);
     int[] intEmpty = new int[0];
 
-    long[] longNotEmpty = new long[] {1, 2, 3, 4};
+    long[] longNotEmpty = ArrayUtils.make(1L, 2L, 3L, 4L);
     long[] longEmpty = new long[0];
 
-    short[] shortNotEmpty = new short[] {1, 2, 3, 4};
+    short[] shortNotEmpty = ArrayUtils.make((short)1, (short)2, (short)3, (short)4);
     short[] shortEmpty = new short[0];
 
-    String[] stringNotEmpty = new String[] {"abc", "def", "ghi", "jkl"};
+    String[] stringNotEmpty = ArrayUtils.make("abc", "def", "ghi", "jkl");
     String[] stringEmpty = new String[0];
 
-    Integer[] integerNotEmpty = new Integer[] {1, 2, 3, 4};
+    Integer[] integerNotEmpty = ArrayUtils.makeBoxing(1, 2, 3, 4);
     Integer[] integerEmpty = new Integer[0];
 
     int[][] intArrNotEmpty = new int[][] {{1, 2, 3}, {4, 5}};

@@ -45,7 +45,7 @@ public final class ArrayUtils {
         return getLength(array) == 0;
     }
 
-    public static boolean isEmpty(final Object[] array) {
+    public static <T> boolean isEmpty(final T[] array) {
         return getLength(array) == 0;
     }
 
@@ -515,5 +515,74 @@ public final class ArrayUtils {
             System.arraycopy(array, index, result, index + values.length, array.length - index);
         }
         return result;
+    }
+
+    public static boolean[] make(boolean... elements) {
+        return elements;
+    }
+
+    public static Boolean[] makeBoxing(Boolean... elements) {
+        return elements;
+    }
+
+    public static byte[] make(byte... elements) {
+        return elements;
+    }
+
+    public static Byte[] makeBoxing(Byte... elements) {
+        return elements;
+    }
+
+    public static char[] make(char... elements) {
+        return elements;
+    }
+
+    public static Character[] makeBoxing(Character... elements) {
+        return elements;
+    }
+
+    public static double[] make(double... elements) {
+        return elements;
+    }
+
+    public static Double[] makeBoxing(Double... elements) {
+        return elements;
+    }
+
+    public static float[] make(float... elements) {
+        return elements;
+    }
+
+    public static Float[] makeBoxing(Float... elements) {
+        return elements;
+    }
+
+    public static int[] make(int... elements) {
+        return elements;
+    }
+
+    public static Integer[] makeBoxing(Integer... elements) {
+        return elements;
+    }
+
+    public static long[] make(long... elements) {
+        return elements;
+    }
+
+    public static Long[] makeBoxing(Long... elements) {
+        return elements;
+    }
+
+    public static short[] make(short... elements) {
+        return elements;
+    }
+
+    public static Short[] makeBoxing(Short... elements) {
+        return elements;
+    }
+
+    @SafeVarargs
+    public static <T> T[] make(T... elements) {
+        return elements;
     }
 }
