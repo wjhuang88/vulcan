@@ -517,67 +517,35 @@ public final class ArrayUtils {
         return result;
     }
 
-    public static boolean[] make(boolean... elements) {
+    public static boolean[] makeUnboxing(boolean... elements) {
         return elements;
     }
 
-    public static Boolean[] makeBoxing(Boolean... elements) {
+    public static byte[] makeUnboxing(byte... elements) {
         return elements;
     }
 
-    public static byte[] make(byte... elements) {
+    public static char[] makeUnboxing(char... elements) {
         return elements;
     }
 
-    public static Byte[] makeBoxing(Byte... elements) {
+    public static double[] makeUnboxing(double... elements) {
         return elements;
     }
 
-    public static char[] make(char... elements) {
+    public static float[] makeUnboxing(float... elements) {
         return elements;
     }
 
-    public static Character[] makeBoxing(Character... elements) {
+    public static int[] makeUnboxing(int... elements) {
         return elements;
     }
 
-    public static double[] make(double... elements) {
+    public static long[] makeUnboxing(long... elements) {
         return elements;
     }
 
-    public static Double[] makeBoxing(Double... elements) {
-        return elements;
-    }
-
-    public static float[] make(float... elements) {
-        return elements;
-    }
-
-    public static Float[] makeBoxing(Float... elements) {
-        return elements;
-    }
-
-    public static int[] make(int... elements) {
-        return elements;
-    }
-
-    public static Integer[] makeBoxing(Integer... elements) {
-        return elements;
-    }
-
-    public static long[] make(long... elements) {
-        return elements;
-    }
-
-    public static Long[] makeBoxing(Long... elements) {
-        return elements;
-    }
-
-    public static short[] make(short... elements) {
-        return elements;
-    }
-
-    public static Short[] makeBoxing(Short... elements) {
+    public static short[] makeUnboxing(short... elements) {
         return elements;
     }
 

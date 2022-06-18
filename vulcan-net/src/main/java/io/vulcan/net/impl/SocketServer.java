@@ -58,7 +58,7 @@ public class SocketServer {
         if (null == chs || 0 == chs.length) {
             throw new IllegalArgumentException("Initializer channel handler is null");
         }
-        return new ChannelInitializer<>() {
+        return new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(@NotNull SocketChannel ch) {
                 ch.pipeline().addLast(chs);

@@ -6,37 +6,37 @@ import org.junit.jupiter.api.Test;
 
 class ArrayUtilsTest {
 
-    boolean[] booleanNotEmpty = ArrayUtils.make(true, false, false, true);
+    boolean[] booleanNotEmpty = ArrayUtils.makeUnboxing(true, false, false, true);
     boolean[] booleanEmpty = new boolean[0];
 
-    byte[] byteNotEmpty = ArrayUtils.make((byte)1, (byte)2, (byte)3, (byte)4);
+    byte[] byteNotEmpty = ArrayUtils.makeUnboxing((byte)1, (byte)2, (byte)3, (byte)4);
     byte[] byteEmpty = new byte[0];
 
-    char[] charNotEmpty = ArrayUtils.make('a', 'b', 'c', 'd');
+    char[] charNotEmpty = ArrayUtils.makeUnboxing('a', 'b', 'c', 'd');
     char[] charEmpty = new char[0];
 
-    double[] doubleNotEmpty = ArrayUtils.make(1.1, 2.1, 3.1, 4.1);
+    double[] doubleNotEmpty = ArrayUtils.makeUnboxing(1.1, 2.1, 3.1, 4.1);
     double[] doubleEmpty = new double[0];
 
-    float[] floatNotEmpty = ArrayUtils.make(1.1F, 2.1F, 3.1F, 4.1F);
+    float[] floatNotEmpty = ArrayUtils.makeUnboxing(1.1F, 2.1F, 3.1F, 4.1F);
     float[] floatEmpty = new float[0];
 
-    int[] intNotEmpty = ArrayUtils.make(1, 2, 3, 4);
+    int[] intNotEmpty = ArrayUtils.makeUnboxing(1, 2, 3, 4);
     int[] intEmpty = new int[0];
 
-    long[] longNotEmpty = ArrayUtils.make(1L, 2L, 3L, 4L);
+    long[] longNotEmpty = ArrayUtils.makeUnboxing(1L, 2L, 3L, 4L);
     long[] longEmpty = new long[0];
 
-    short[] shortNotEmpty = ArrayUtils.make((short)1, (short)2, (short)3, (short)4);
+    short[] shortNotEmpty = ArrayUtils.makeUnboxing((short)1, (short)2, (short)3, (short)4);
     short[] shortEmpty = new short[0];
 
     String[] stringNotEmpty = ArrayUtils.make("abc", "def", "ghi", "jkl");
     String[] stringEmpty = new String[0];
 
-    Integer[] integerNotEmpty = ArrayUtils.makeBoxing(1, 2, 3, 4);
+    Integer[] integerNotEmpty = ArrayUtils.make(1, 2, 3, 4);
     Integer[] integerEmpty = new Integer[0];
 
-    int[][] intArrNotEmpty = new int[][] {{1, 2, 3}, {4, 5}};
+    int[][] intArrNotEmpty = ArrayUtils.make(ArrayUtils.makeUnboxing(1, 2, 3), ArrayUtils.makeUnboxing(4, 5));
     int[][] intArrEmpty = new int[0][];
 
     @Test
