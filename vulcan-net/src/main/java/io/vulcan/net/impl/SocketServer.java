@@ -1,4 +1,4 @@
-package io.vulcan.net;
+package io.vulcan.net.impl;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,10 +9,13 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.vulcan.net.CloseHandler;
 import io.vulcan.worker.WorkerPool;
 import org.jetbrains.annotations.NotNull;
 
 public class SocketServer {
+
+    private static final Integer BACKLOG = 128;
 
     private final int port;
     private final EventLoopGroup bossGroup;
@@ -30,7 +33,7 @@ public class SocketServer {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(makeInitializer(chs))
-                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_BACKLOG, BACKLOG)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             final ChannelFuture f = b.bind(port).sync();
             f.channel().closeFuture().sync();
@@ -45,36 +48,35 @@ public class SocketServer {
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(makeInitializer(chs))
-                .option(ChannelOption.SO_BACKLOG, 128)
+                .option(ChannelOption.SO_BACKLOG, BACKLOG)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
         final ChannelFuture f = b.bind(port);
-        return new CloseHandler(f);
+        return new InternalCloseHandler(f);
     }
 
     private ChannelInitializer<SocketChannel> makeInitializer(ChannelHandler... chs) {
         if (null == chs || 0 == chs.length) {
             throw new IllegalArgumentException("Initializer channel handler is null");
         }
-        return new ChannelInitializer<SocketChannel>() {
+        return new ChannelInitializer<>() {
             @Override
-            protected void initChannel(@NotNull SocketChannel ch) throws Exception {
+            protected void initChannel(@NotNull SocketChannel ch) {
                 ch.pipeline().addLast(chs);
             }
         };
     }
 
-    public class CloseHandler implements AutoCloseable {
+    private class InternalCloseHandler implements CloseHandler {
         private final ChannelFuture f;
-        private
-        CloseHandler(ChannelFuture f) {
+        private InternalCloseHandler(ChannelFuture f) {
             this.f = f;
         }
 
         @Override
-        public void close() throws InterruptedException {
+        public ChannelFuture closeAsync() {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
-            f.channel().closeFuture().sync();
+            return f.channel().closeFuture();
         }
     }
 }

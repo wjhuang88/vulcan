@@ -1,6 +1,7 @@
 package io.vulcan.net;
 
 import io.vulcan.net.echo.EchoHandler;
+import io.vulcan.net.impl.SocketServer;
 import io.vulcan.worker.WorkerPool;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SocketServerTest {
 
-    private static SocketServer.CloseHandler closeHandler;
+    private static CloseHandler closeHandler;
 
     @BeforeAll
     static void beforeAll() {
