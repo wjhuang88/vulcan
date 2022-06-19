@@ -20,7 +20,7 @@ class SocketServerTest {
     static void beforeAll() {
         int port = 8080;
         System.out.println("服务端开始启动；" + Thread.currentThread());
-        closeHandler = new SocketServer(port, WorkerPool.getDefault()).startAsync(new EchoHandler());
+        closeHandler = new SocketServer(port, WorkerPool.getDefault()).start(new EchoHandler());
         System.out.println("服务端启动完成；" + Thread.currentThread());
     }
 

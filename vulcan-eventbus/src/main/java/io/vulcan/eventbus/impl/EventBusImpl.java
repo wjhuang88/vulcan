@@ -28,8 +28,7 @@ public final class EventBusImpl implements EventBus {
     private final AtomicBoolean closed = new AtomicBoolean();
 
     public EventBusImpl() {
-        registerEventStrategy(LOCAL_SCHEMA, new LocalEventStrategy(WorkerPool.getDefault()));
-        closed.getAndSet(false);
+        this(WorkerPool.getDefault());
     }
 
     public EventBusImpl(WorkerPool pool) {

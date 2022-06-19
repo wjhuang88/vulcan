@@ -21,29 +21,17 @@ public class SocketServer {
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workerGroup;
 
+    public SocketServer(int port) {
+        this(port, WorkerPool.getDefault());
+    }
+
     public SocketServer(int port, WorkerPool pool) {
         this.port = port;
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup(pool.maxSize(), pool.executor());
     }
 
-    public void start(ChannelHandler... chs) throws InterruptedException {
-        try {
-            final ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(makeInitializer(chs))
-                    .option(ChannelOption.SO_BACKLOG, BACKLOG)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
-            final ChannelFuture f = b.bind(port).sync();
-            f.channel().closeFuture().sync();
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        }
-    }
-
-    public CloseHandler startAsync(ChannelHandler... chs) {
+    public CloseHandler start(ChannelHandler... chs) {
         final ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
