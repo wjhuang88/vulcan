@@ -2,10 +2,10 @@ package io.vulcan.net;
 
 import io.netty.channel.ChannelFuture;
 
-public interface CloseHandler extends AutoCloseable{
+public interface CloseHandler extends AutoCloseable {
     ChannelFuture closeAsync();
 
-    default void close() throws InterruptedException {
-        closeAsync().sync();
+    default void close() {
+        closeAsync().syncUninterruptibly();
     }
 }

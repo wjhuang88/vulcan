@@ -1,7 +1,10 @@
 package io.vulcan.net.impl;
 
+import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import io.vulcan.net.CloseHandler;
 import io.vulcan.worker.WorkerPool;
 
@@ -16,11 +19,17 @@ public class HttpServer extends SocketServer {
     }
 
     public CloseHandler start() {
-        return super.start(new HttpServerCodec(), new HttpServerExpectContinueHandler(), new HttpServerHandler());
+        return super.start(
+                new HttpServerCodec(),
+                new HttpContentCompressor(),
+                new ChunkedWriteHandler(),
+                new HttpServerKeepAliveHandler(),
+                new HttpServerExpectContinueHandler(),
+                new HttpServerHandler());
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         HttpServer server = new HttpServer(8888);
-        CloseHandler start = server.start();
+        server.start();
     }
 }

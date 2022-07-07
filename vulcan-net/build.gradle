@@ -4,8 +4,9 @@ plugins {
 
 description 'vulcan net tools based on netty'
 
-repositories {
-    mavenCentral()
+java {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
 }
 
 dependencies {

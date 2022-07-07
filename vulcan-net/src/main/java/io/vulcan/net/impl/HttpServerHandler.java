@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
+import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderValues.CLOSE;
@@ -14,21 +15,21 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
-    private static final byte[] CONTENT = { 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd' };
-
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
+
         if (msg instanceof HttpRequest) {
             HttpRequest req = (HttpRequest) msg;
 
             boolean keepAlive = HttpUtil.isKeepAlive(req);
             FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), OK,
-                    Unpooled.wrappedBuffer(CONTENT));
+                    Unpooled.wrappedBuffer("CONTENT".getBytes(StandardCharsets.UTF_8)));
             response.headers()
                     .set(CONTENT_TYPE, TEXT_PLAIN)
                     .setInt(CONTENT_LENGTH, response.content().readableBytes());
