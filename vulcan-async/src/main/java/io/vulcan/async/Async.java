@@ -1,9 +1,9 @@
 package io.vulcan.async;
 
-import io.vulcan.api.base.functional.Callable;
 import io.vulcan.async.impl.AsyncImpl;
 import io.vulcan.worker.WorkerPool;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import reactor.core.publisher.Flux;

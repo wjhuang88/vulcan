@@ -4,6 +4,7 @@ import io.vulcan.api.base.functional.Callable;
 import io.vulcan.api.base.functional.Callback;
 import io.vulcan.api.base.functional.Runnable;
 import io.vulcan.worker.impl.WorkerPoolImpl;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -15,25 +16,6 @@ public interface WorkerPool extends AutoCloseable {
 
     static WorkerPool getDefault() {
         return Holder.INSTANCE;
-    }
-
-    static WorkerPool getDefault(RunnableHandler runnableHandler) {
-        final WorkerPoolImpl pool = Holder.INSTANCE;
-        pool.onRejected(runnableHandler);
-        return pool;
-    }
-
-    static WorkerPool getDefault(CallableHandler callableHandler) {
-        final WorkerPoolImpl pool = Holder.INSTANCE;
-        pool.onRejected(callableHandler);
-        return pool;
-    }
-
-    static WorkerPool getDefault(RunnableHandler runnableHandler, CallableHandler callableHandler) {
-        final WorkerPoolImpl pool = Holder.INSTANCE;
-        pool.onRejected(runnableHandler);
-        pool.onRejected(callableHandler);
-        return pool;
     }
 
     static WorkerPool create() {
@@ -70,6 +52,18 @@ public interface WorkerPool extends AutoCloseable {
     void execute(Runnable runnable, Callback<Void, Throwable> callback);
 
     <R> void execute(Callable<R> callable, Callback<R, Throwable> callback);
+
+    default CompletableFuture<Void> execute(Runnable runnable) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+        execute(runnable, Callback.make(future));
+        return future;
+    }
+
+    default <R> CompletableFuture<R> execute(Callable<R> callable) {
+        final CompletableFuture<R> future = new CompletableFuture<>();
+        execute(callable, Callback.make(future));
+        return future;
+    }
 
     interface RunnableHandler extends Consumer<io.vulcan.api.base.functional.Runnable> {}
 

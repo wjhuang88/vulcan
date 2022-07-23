@@ -1,15 +1,16 @@
 package io.vulcan.async.impl;
 
-import io.vulcan.api.base.functional.Callable;
 import io.vulcan.api.base.functional.Callback;
 import io.vulcan.async.Async;
 import io.vulcan.worker.WorkerPool;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoSink;
 
 public class AsyncImpl implements Async {
 
@@ -21,24 +22,12 @@ public class AsyncImpl implements Async {
 
     @Override
     public <T> Mono<T> run(Callable<T> callable) {
-        return Mono.create(sink -> stage(callable).whenComplete((r, e) -> {
-            if (e != null) {
-                sink.error(e);
-            } else {
-                sink.success(r);
-            }
-        }));
+        return Mono.create(sink -> workerPool.execute(callable::call, makeCallback(sink)));
     }
 
     @Override
     public Mono<Void> run(Runnable runnable) {
-        return Mono.create(sink -> stage(runnable).whenComplete((r, e) -> {
-            if (e != null) {
-                sink.error(e);
-            } else {
-                sink.success(r);
-            }
-        }));
+        return Mono.create(sink -> workerPool.execute(runnable::run, makeCallback(sink)));
     }
 
     @Override
@@ -46,58 +35,18 @@ public class AsyncImpl implements Async {
         if (callables == null || callables.isEmpty()) {
             return Flux.empty();
         }
-        return Flux.create(sink -> {
-            final int size = callables.size();
 
-            @SuppressWarnings("rawtypes")
-            final CompletableFuture[] futureArr = new CompletableFuture[size];
-
-            int i = 0;
-            for (Callable<T> callable : callables) {
-                futureArr[i++] = stage(callable).thenAccept(sink::next).toCompletableFuture();
-            }
-            CompletableFuture.allOf(futureArr).whenComplete((r, e) -> {
-                if (e != null) {
-                    sink.error(e);
-                } else {
-                    sink.complete();
-                }
-            });
-        });
+        return Flux.mergeSequential(callables.stream().map(this::run).collect(Collectors.toList()));
     }
 
     @Override
     public <T> CompletionStage<T> stage(Callable<T> callable) {
-        final CompletableFuture<T> completableFuture = new CompletableFuture<>();
-        workerPool.execute(callable, new Callback<T, Throwable>() {
-            @Override
-            public void onSuccess(T sendResult) {
-                completableFuture.complete(sendResult);
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                completableFuture.completeExceptionally(throwable);
-            }
-        });
-        return completableFuture;
+        return workerPool.execute(callable::call);
     }
 
     @Override
     public CompletionStage<Void> stage(Runnable runnable) {
-        final CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-        workerPool.execute(runnable::run, new Callback<Void, Throwable>() {
-            @Override
-            public void onSuccess(Void sendResult) {
-                completableFuture.complete(null);
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                completableFuture.completeExceptionally(throwable);
-            }
-        });
-        return completableFuture;
+        return workerPool.execute(runnable::run);
     }
 
     @Override
@@ -108,5 +57,19 @@ public class AsyncImpl implements Async {
     @Override
     public Future<Void> future(Runnable runnable) {
         return stage(runnable).toCompletableFuture();
+    }
+
+    private <R> Callback<R, Throwable> makeCallback(MonoSink<R> sink) {
+        return new Callback<R, Throwable>() {
+            @Override
+            public void onSuccess(R sendResult) {
+                sink.success(sendResult);
+            }
+
+            @Override
+            public void onException(Throwable throwable) {
+                sink.error(throwable);
+            }
+        };
     }
 }

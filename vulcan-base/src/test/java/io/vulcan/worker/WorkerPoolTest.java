@@ -86,7 +86,7 @@ class WorkerPoolTest {
     @Test
     void failHandlerTest1() throws Throwable {
 
-        WorkerPool pool = WorkerPool.getDefault((CallableHandler) callable -> System.out.println("Fail handler(callable) thread: " + Thread.currentThread()));
+        WorkerPool pool = WorkerPool.create((CallableHandler) callable -> System.out.println("Fail handler(callable) thread: " + Thread.currentThread()));
 
         VertxTestContext testContext = new VertxTestContext();
         pool.execute(() -> {
@@ -106,7 +106,7 @@ class WorkerPoolTest {
     @Test
     void failHandlerTest2() throws Throwable {
 
-        WorkerPool pool = WorkerPool.getDefault((RunnableHandler) runnable -> System.out.println("Fail handler(runnable) thread: " + Thread.currentThread()));
+        WorkerPool pool = WorkerPool.create((RunnableHandler) runnable -> System.out.println("Fail handler(runnable) thread: " + Thread.currentThread()));
 
         VertxTestContext testContext = new VertxTestContext();
         pool.execute(() -> System.out.println("runnable thread: " + Thread.currentThread()), r -> {
@@ -123,7 +123,7 @@ class WorkerPoolTest {
     @Test
     void failHandlerTest3() throws Throwable {
 
-        WorkerPool pool = WorkerPool.getDefault(
+        WorkerPool pool = WorkerPool.create(
                 runnable -> System.out.println("Fail handler(runnable) thread: " + Thread.currentThread()),
                 callable -> System.out.println("Fail handler(callable) thread: " + Thread.currentThread())
         );
