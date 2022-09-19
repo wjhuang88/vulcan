@@ -386,4 +386,36 @@ class BeanTest {
         assertEquals(4.5, beanDist.getDouble5());
         assertEquals(4.6, beanDist.getDouble6());
     }
+
+    @Test
+    public void beanToMapTest() {
+        Map<String, Object> map = beanManager.beanToMap(bean);
+        System.out.println(map);
+        assertEquals(bean.getFieldA(), map.get("fieldA"));
+        assertEquals(bean.getFieldB(), map.get("fieldB"));
+        assertEquals(bean.getFieldC(), map.get("fieldC"));
+        assertEquals(bean.getFieldD().getFieldDate().getTime(), ((TestTypes)map.get("fieldD")).getFieldDate().getTime());
+//
+        TestLongProp longProp = new TestLongProp();
+        Map<String, Object> longMap = beanManager.beanToMap(longProp);
+        System.out.println(longMap);
+//        MapReverterHelper.INSTANCE.saveClassFile(longProp.getClass(), "temp");
+
+        assertEquals(4L, longMap.get("long4"));
+        assertEquals(5L, longMap.get("long5"));
+        assertEquals(6L, longMap.get("long6"));
+        assertEquals(7L, longMap.get("long7"));
+        assertEquals(8L, longMap.get("long8"));
+        assertEquals(9L, longMap.get("long9"));
+        assertEquals(1, longMap.get("int1"));
+        assertEquals((byte)2, longMap.get("byte1"));
+        assertEquals('2', longMap.get("char1"));
+        assertEquals(2.0f, longMap.get("float1"));
+        assertEquals(4.1d, longMap.get("double1"));
+        assertEquals(4.2d, longMap.get("double2"));
+        assertEquals(4.3d, longMap.get("double3"));
+        assertEquals(4.4d, longMap.get("double4"));
+        assertEquals(4.5d, longMap.get("double5"));
+        assertEquals(4.6d, longMap.get("double6"));
+    }
 }

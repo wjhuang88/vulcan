@@ -1,12 +1,17 @@
 package io.vulcan.bean.impl;
 
+import io.vulcan.api.convertible.From;
 import io.vulcan.api.convertible.FromMap;
 import io.vulcan.api.convertible.IntoMap;
 import io.vulcan.api.helper.bean2bean.BeanConverter;
+import io.vulcan.api.helper.bean2map.MapReverter;
 import io.vulcan.api.helper.map2bean.MapConverter;
 import io.vulcan.bean.Bean;
 import io.vulcan.bean.impl.helper.DateConverter;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +33,7 @@ public final class BeanImpl implements Bean {
     private final BeanUtilsBean beanUtilsBean;
     private final MapConverterHelper mapConverterHelper = MapConverterHelper.INSTANCE;
     private final BeanConverterHelper beanConverterHelper = BeanConverterHelper.INSTANCE;
+    private final MapReverterHelper mapReverterHelper = MapReverterHelper.INSTANCE;
 
     public BeanImpl() {
         final DateConverter dtConverter = DateConverter.getInstance();
@@ -89,7 +95,6 @@ public final class BeanImpl implements Bean {
             return converter.convert(map, instance);
         } catch (Throwable e) {
             log.warn("Convert map to java bean instance fail, use beanutils instead.", e);
-//            throw new RuntimeException("err!!!", e);
             return mapToBeanOld(map, instance);
         }
     }
@@ -244,13 +249,6 @@ public final class BeanImpl implements Bean {
         return null;
     }
 
-    /**
-     * Convert a java bean to a map.
-     *
-     * @param bean bean to be converted
-     * @param <T>  bean type
-     * @return result map
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T> Map<String, Object> beanToMap(final T bean) {
@@ -258,7 +256,21 @@ public final class BeanImpl implements Bean {
             final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
             return (Map<String, Object>) map;
         }
+        final MapReverter<T> reverter = mapReverterHelper.get(bean);
+        if (reverter == null) {
+            return beanToMapOld(bean);
+        }
 
+        final Map<String, Object> map = new HashMap<>();
+        try {
+            return reverter.revert(map, bean);
+        } catch (Throwable e) {
+            log.warn("Convert bean to map fail, use beanmap instead.", e);
+            return beanToMapOld(bean);
+        }
+    }
+
+    <T> Map<String, Object> beanToMapOld(final T bean) {
         final BeanMap beanMap = new BeanMap();
         beanMap.setBean(bean);
         Map<String, Object> copy = new HashMap<>();
@@ -267,6 +279,22 @@ public final class BeanImpl implements Bean {
             copy.put(key.toString(), beanMap.get(key));
         }
         return copy;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Map<String, Object> beanToMap(MapReverter<T> reverter, final T bean) {
+        if (bean instanceof IntoMap) {
+            final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
+            return (Map<String, Object>) map;
+        }
+
+        final Map<String, Object> map = new HashMap<>();
+        try {
+            return reverter.revert(map, bean);
+        } catch (Throwable e) {
+            log.warn("Convert bean to map fail, use beanmap instead.", e);
+            return beanToMapOld(bean);
+        }
     }
 
     @Override
@@ -288,7 +316,31 @@ public final class BeanImpl implements Bean {
         if (beanList == null || beanList.isEmpty()) {
             return Collections.emptyList();
         }
-        return beanList.stream().map(this::beanToMap).collect(Collectors.toList());
+
+        final Optional<ParameterizedType> listInterface = Arrays.stream(beanList.getClass().getGenericInterfaces())
+                .filter(type -> type instanceof ParameterizedType)
+                .map(type -> (ParameterizedType) type)
+                .filter(type -> type.getRawType() == List.class)
+                .findFirst();
+        if (!listInterface.isPresent()) {
+            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+        }
+
+        final ParameterizedType listType = listInterface.get();
+        final Type[] typeParameters = listType.getActualTypeArguments();
+        assert typeParameters.length == 1;
+
+        if (!(typeParameters[0] instanceof Class)) {
+            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+        }
+
+        @SuppressWarnings("unchecked")
+        final MapReverter<T> reverter = mapReverterHelper.get((Class<T>) typeParameters[0]);
+        if (reverter == null) {
+            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+        }
+
+        return beanList.stream().map(input -> beanToMap(reverter, input)).collect(Collectors.toList());
     }
 
     @Override
