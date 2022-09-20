@@ -1,6 +1,7 @@
 package io.vulcan.bean;
 
 import io.vulcan.api.helper.bean2bean.BeanConverter;
+import io.vulcan.api.helper.bean2map.MapReverter;
 import io.vulcan.api.helper.map2bean.MapConverter;
 import io.vulcan.bean.impl.BeanImpl;
 import java.util.List;
@@ -17,6 +18,8 @@ public interface Bean {
     }
 
     <T> void register(Class<T> distClass, MapConverter<T> converter);
+
+    <T> void register(Class<T> distClass, MapReverter<T> converter);
 
     <T> void speedup(Class<T> distClass);
 

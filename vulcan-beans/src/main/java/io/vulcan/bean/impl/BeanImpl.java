@@ -1,6 +1,5 @@
 package io.vulcan.bean.impl;
 
-import io.vulcan.api.convertible.From;
 import io.vulcan.api.convertible.FromMap;
 import io.vulcan.api.convertible.IntoMap;
 import io.vulcan.api.helper.bean2bean.BeanConverter;
@@ -49,8 +48,14 @@ public final class BeanImpl implements Bean {
     }
 
     @Override
+    public <T> void register(Class<T> distClass, MapReverter<T> converter) {
+        mapReverterHelper.addConverter(distClass, converter);
+    }
+
+    @Override
     public <T> void speedup(Class<T> distClass) {
         mapConverterHelper.addConverter(distClass);
+        mapReverterHelper.addConverter(distClass);
     }
 
     @Override
