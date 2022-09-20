@@ -142,6 +142,11 @@ io.vulcan.api.helper.map2bean.MapConverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapConverter，注册转换器如下：
 BeanUtils.register(DistClazz.class, mapConverter);
 
+// 实现T类型对象的beanToMap的转换逻辑
+com.runyi.ryplat.utils.helper.map2bean.MapReverter<T>
+// 假设对DistClazz类的转换器实现类对象为mapReverter，注册转换器如下：
+U.bean.register(DistClazz.class, mapReverter);
+
 // 实现S类型对象到D类型对象的转换逻辑
 io.vulcan.api.helper.bean2bean.BeanConverter<S,D>
 // 假设对SrcClazz到DistClazz的转换器实现类对象为beanConverter，注册转换器如下：
@@ -157,7 +162,7 @@ import io.vulcan.bean.Bean;
 
 Bean beanManager = Bean.getInstance();
 
-// SrcClazz类型对象到map对象的mapToBean方法预热
+// SrcClazz类型对象到map对象的mapToBean和beanToMap方法预热
 beanManager.speedup(SrcClazz.class);
 
 // SrcClazz类型对象到DistClazz类型对象的beanToBean方法预热
