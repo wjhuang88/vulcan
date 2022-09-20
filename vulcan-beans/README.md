@@ -137,20 +137,25 @@ io.vulcan.api.convertible.Copiable<T>
 可以通过实现自定义转换器并注册到工具类中，实现不侵入原始代码的情况下改变特定类转换的实现逻辑，框架中提供了两种转换器接口分别对应mapToBean和beanToBean的情况：
 
 ```java
+import io.vulcan.bean.Bean;
+// ...
+
+Bean beanManager = Bean.getInstance();
+
 // 实现T类型对象的mapToBean的转换逻辑
 io.vulcan.api.helper.map2bean.MapConverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapConverter，注册转换器如下：
-BeanUtils.register(DistClazz.class, mapConverter);
+beanManager.register(DistClazz.class, mapConverter);
 
 // 实现T类型对象的beanToMap的转换逻辑
 io.vulcan.api.helper.map2bean.MapReverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapReverter，注册转换器如下：
-U.bean.register(DistClazz.class, mapReverter);
+beanManager.register(DistClazz.class, mapReverter);
 
 // 实现S类型对象到D类型对象的转换逻辑
 io.vulcan.api.helper.bean2bean.BeanConverter<S,D>
 // 假设对SrcClazz到DistClazz的转换器实现类对象为beanConverter，注册转换器如下：
-BeanUtils.register(SrcClazz.class, DistClazz.class, beanConverter);
+beanManager.register(SrcClazz.class, DistClazz.class, beanConverter);
 ```
 
 ## 性能优化
