@@ -15,7 +15,7 @@ io.vulcan.bean.Bean
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 Map<String, Object> map = new HashMap<>();
 // 填充数据
@@ -38,7 +38,7 @@ beanManager.mapToBean(map, newObject2); // 此时newObject2会被填充map中的
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 SourceClazz src = new SourceClazz();
 // 填充数据
@@ -61,7 +61,7 @@ beanManager.beanToBean(src, dist2); // 此时dist2的属性会被填充src中相
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 SourceClazz src = new SourceClazz();
 // 填充数据
@@ -79,7 +79,7 @@ Map<String, Object> map = beanManager.beanToMap(src); // map中包含src对象�
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 List<Map<String, Object>> srcMapList = new ArrayList<>();
 // 填充数据
@@ -140,7 +140,7 @@ io.vulcan.api.convertible.Copiable<T>
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 // 实现T类型对象的mapToBean的转换逻辑
 io.vulcan.api.helper.map2bean.MapConverter<T>
@@ -165,7 +165,7 @@ beanManager.register(SrcClazz.class, DistClazz.class, beanConverter);
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 // SrcClazz类型对象到map对象的mapToBean和beanToMap方法预热
 beanManager.speedup(SrcClazz.class);
