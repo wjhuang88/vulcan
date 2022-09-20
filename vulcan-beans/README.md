@@ -143,7 +143,7 @@ io.vulcan.api.helper.map2bean.MapConverter<T>
 BeanUtils.register(DistClazz.class, mapConverter);
 
 // 实现T类型对象的beanToMap的转换逻辑
-com.runyi.ryplat.utils.helper.map2bean.MapReverter<T>
+io.vulcan.api.helper.map2bean.MapReverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapReverter，注册转换器如下：
 U.bean.register(DistClazz.class, mapReverter);
 
