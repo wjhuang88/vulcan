@@ -15,7 +15,7 @@ io.vulcan.bean.Bean
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 Map<String, Object> map = new HashMap<>();
 // 填充数据
@@ -38,7 +38,7 @@ beanManager.mapToBean(map, newObject2); // 此时newObject2会被填充map中的
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 SourceClazz src = new SourceClazz();
 // 填充数据
@@ -61,7 +61,7 @@ beanManager.beanToBean(src, dist2); // 此时dist2的属性会被填充src中相
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 SourceClazz src = new SourceClazz();
 // 填充数据
@@ -79,7 +79,7 @@ Map<String, Object> map = beanManager.beanToMap(src); // map中包含src对象�
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 List<Map<String, Object>> srcMapList = new ArrayList<>();
 // 填充数据
@@ -137,20 +137,25 @@ io.vulcan.api.convertible.Copiable<T>
 可以通过实现自定义转换器并注册到工具类中，实现不侵入原始代码的情况下改变特定类转换的实现逻辑，框架中提供了两种转换器接口分别对应mapToBean和beanToBean的情况：
 
 ```java
+import io.vulcan.bean.Bean;
+// ...
+
+Bean beanManager = Bean.getDefault();
+
 // 实现T类型对象的mapToBean的转换逻辑
 io.vulcan.api.helper.map2bean.MapConverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapConverter，注册转换器如下：
-BeanUtils.register(DistClazz.class, mapConverter);
+beanManager.register(DistClazz.class, mapConverter);
 
 // 实现T类型对象的beanToMap的转换逻辑
-com.runyi.ryplat.utils.helper.map2bean.MapReverter<T>
+io.vulcan.api.helper.map2bean.MapReverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapReverter，注册转换器如下：
-U.bean.register(DistClazz.class, mapReverter);
+beanManager.register(DistClazz.class, mapReverter);
 
 // 实现S类型对象到D类型对象的转换逻辑
 io.vulcan.api.helper.bean2bean.BeanConverter<S,D>
 // 假设对SrcClazz到DistClazz的转换器实现类对象为beanConverter，注册转换器如下：
-BeanUtils.register(SrcClazz.class, DistClazz.class, beanConverter);
+beanManager.register(SrcClazz.class, DistClazz.class, beanConverter);
 ```
 
 ## 性能优化
@@ -160,7 +165,7 @@ BeanUtils.register(SrcClazz.class, DistClazz.class, beanConverter);
 import io.vulcan.bean.Bean;
 // ...
 
-Bean beanManager = Bean.getInstance();
+Bean beanManager = Bean.getDefault();
 
 // SrcClazz类型对象到map对象的mapToBean和beanToMap方法预热
 beanManager.speedup(SrcClazz.class);
