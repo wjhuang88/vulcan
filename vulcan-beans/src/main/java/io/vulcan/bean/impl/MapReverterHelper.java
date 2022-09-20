@@ -7,7 +7,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.vulcan.api.helper.bean2map.MapReverter;
 import io.vulcan.bean.impl.helper.bean2map.BeanToMapMethodImpl;
-import io.vulcan.bean.impl.helper.map2bean.MapToBeanMethodImpl;
 import io.vulcan.bean.impl.helper.translator.Translators;
 import io.vulcan.bean.impl.helper.translator.bytecode.TranslatorImplementation;
 import java.io.File;

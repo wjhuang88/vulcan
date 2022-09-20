@@ -395,11 +395,10 @@ class BeanTest {
         assertEquals(bean.getFieldB(), map.get("fieldB"));
         assertEquals(bean.getFieldC(), map.get("fieldC"));
         assertEquals(bean.getFieldD().getFieldDate().getTime(), ((TestTypes)map.get("fieldD")).getFieldDate().getTime());
-//
+
         TestLongProp longProp = new TestLongProp();
         Map<String, Object> longMap = beanManager.beanToMap(longProp);
         System.out.println(longMap);
-//        MapReverterHelper.INSTANCE.saveClassFile(longProp.getClass(), "temp");
 
         assertEquals(4L, longMap.get("long4"));
         assertEquals(5L, longMap.get("long5"));
