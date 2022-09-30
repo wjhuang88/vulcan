@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LocalEventStrategy implements EventStrategy {
 
-    private final static int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 1024;
 
     private final Logger log = LoggerFactory.getLogger(LocalEventStrategy.class);
 
