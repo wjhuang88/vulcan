@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -106,60 +105,6 @@ public final class BeanImpl implements Bean {
         }
     }
 
-    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final T instance) {
-        if (instance instanceof FromMap) {
-            ((FromMap) instance).from(map);
-            return instance;
-        }
-
-        try {
-            return converter.convert(map, instance);
-        } catch (Throwable e) {
-            log.warn("Convert map to java bean instance fail, use beanutils instead.", e);
-            return mapToBeanOld(map, instance);
-        }
-    }
-
-    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final Class<T> clazz) {
-        final T instance;
-        try {
-            instance = clazz.getDeclaredConstructor().newInstance();
-            return mapToBean(converter, map, instance);
-        } catch (NoSuchMethodException e) {
-            log.error("Class " + clazz.getName() + " must have a no arguments constructor.", e);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            log.error("Convert map to java bean instance fail", e);
-        }
-        return null;
-    }
-
-    <T> T mapToBeanOld(final Map<String, Object> map, final T instance) {
-        if (instance instanceof FromMap) {
-            ((FromMap) instance).from(map);
-            return instance;
-        }
-
-        try {
-            beanUtilsBean.populate(instance, map);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Convert map to java bean instance fail", e);
-        }
-        return instance;
-    }
-
-    <T> T mapToBeanOld(final Map<String, Object> map, final Class<T> clazz) {
-        final T instance;
-        try {
-            instance = clazz.getDeclaredConstructor().newInstance();
-            return mapToBeanOld(map, instance);
-        } catch (NoSuchMethodException e) {
-            log.error("Class " + clazz.getName() + " must have a no arguments constructor.", e);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            log.error("Convert map to java bean instance fail", e);
-        }
-        return null;
-    }
-
     @Override
     public <D, S> D beanToBean(final S src, final Class<D> distClass) {
         final D dist;
@@ -200,62 +145,6 @@ public final class BeanImpl implements Bean {
         }
     }
 
-    <D, S> D beanToBeanOld(final S src, final D dist) {
-        final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
-        if (result.isPresent()) {
-            return result.get();
-        }
-
-        try {
-            beanUtilsBean.copyProperties(dist, src);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Copy properties fail", e);
-        }
-        return dist;
-    }
-
-    <D, S> D beanToBeanOld(final S src, final Class<D> distClass) {
-
-        final D dist;
-        try {
-            dist = distClass.getDeclaredConstructor().newInstance();
-            return beanToBeanOld(src, dist);
-        } catch (NoSuchMethodException e) {
-            log.error("Class " + distClass.getName() + " must have a no arguments constructor.", e);
-        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Copy properties fail", e);
-        }
-        return null;
-    }
-
-    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final D dist) {
-        final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
-        if (result.isPresent()) {
-            return result.get();
-        }
-
-        try {
-            return converter.convert(src, dist);
-        } catch (Throwable e) {
-            log.warn("Convert bean to bean fail, use beanutils instead.", e);
-            return beanToBeanOld(src, dist);
-        }
-    }
-
-    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final Class<D> distClass) {
-
-        final D dist;
-        try {
-            dist = distClass.getDeclaredConstructor().newInstance();
-            return beanToBean(converter, src, dist);
-        } catch (NoSuchMethodException e) {
-            log.error("Class " + distClass.getName() + " must have a no arguments constructor.", e);
-        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Copy properties fail", e);
-        }
-        return null;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public <T> Map<String, Object> beanToMap(final T bean) {
@@ -266,33 +155,6 @@ public final class BeanImpl implements Bean {
         final MapReverter<T> reverter = mapReverterHelper.get(bean);
         if (reverter == null) {
             return beanToMapOld(bean);
-        }
-
-        final Map<String, Object> map = new HashMap<>();
-        try {
-            return reverter.revert(map, bean);
-        } catch (Throwable e) {
-            log.warn("Convert bean to map fail, use beanmap instead.", e);
-            return beanToMapOld(bean);
-        }
-    }
-
-    <T> Map<String, Object> beanToMapOld(final T bean) {
-        final BeanMap beanMap = new BeanMap();
-        beanMap.setBean(bean);
-        Map<String, Object> copy = new HashMap<>();
-
-        for (Object key : beanMap.keySet()) {
-            copy.put(key.toString(), beanMap.get(key));
-        }
-        return copy;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Map<String, Object> beanToMap(MapReverter<T> reverter, final T bean) {
-        if (bean instanceof IntoMap) {
-            final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
-            return (Map<String, Object>) map;
         }
 
         final Map<String, Object> map = new HashMap<>();
@@ -384,6 +246,77 @@ public final class BeanImpl implements Bean {
         return convertList(srcList, ignoreNull, input -> beanToBean(converter, input, distClass));
     }
 
+    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final D dist) {
+        final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
+        if (result.isPresent()) {
+            return result.get();
+        }
+
+        try {
+            return converter.convert(src, dist);
+        } catch (Throwable e) {
+            log.warn("Convert bean to bean fail, use beanutils instead.", e);
+            return beanToBeanOld(src, dist);
+        }
+    }
+
+    private <D, S> D beanToBean(BeanConverter<S, D> converter, final S src, final Class<D> distClass) {
+
+        final D dist;
+        try {
+            dist = distClass.getDeclaredConstructor().newInstance();
+            return beanToBean(converter, src, dist);
+        } catch (NoSuchMethodException e) {
+            log.error("Class " + distClass.getName() + " must have a no arguments constructor.", e);
+        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Copy properties fail", e);
+        }
+        return null;
+    }
+
+    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final T instance) {
+        if (instance instanceof FromMap) {
+            ((FromMap) instance).from(map);
+            return instance;
+        }
+
+        try {
+            return converter.convert(map, instance);
+        } catch (Throwable e) {
+            log.warn("Convert map to java bean instance fail, use beanutils instead.", e);
+            return mapToBeanOld(map, instance);
+        }
+    }
+
+    private <T> T mapToBean(MapConverter<T> converter, final Map<String, Object> map, final Class<T> clazz) {
+        final T instance;
+        try {
+            instance = clazz.getDeclaredConstructor().newInstance();
+            return mapToBean(converter, map, instance);
+        } catch (NoSuchMethodException e) {
+            log.error("Class " + clazz.getName() + " must have a no arguments constructor.", e);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            log.error("Convert map to java bean instance fail", e);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Map<String, Object> beanToMap(MapReverter<T> reverter, final T bean) {
+        if (bean instanceof IntoMap) {
+            final Map<String, ?> map = ((IntoMap) bean).to(new HashMap<>());
+            return (Map<String, Object>) map;
+        }
+
+        final Map<String, Object> map = new HashMap<>();
+        try {
+            return reverter.revert(map, bean);
+        } catch (Throwable e) {
+            log.warn("Convert bean to map fail, use beanmap instead.", e);
+            return beanToMapOld(bean);
+        }
+    }
+
     private <F,T> List<T> convertList(List<F> inList, boolean ignoreNull, Function<F, T> handler) {
         if (inList.isEmpty()) {
             return Collections.emptyList();
@@ -400,5 +333,71 @@ public final class BeanImpl implements Bean {
             }
         }
         return result;
+    }
+
+    <T> T mapToBeanOld(final Map<String, Object> map, final T instance) {
+        if (instance instanceof FromMap) {
+            ((FromMap) instance).from(map);
+            return instance;
+        }
+
+        try {
+            beanUtilsBean.populate(instance, map);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error("Convert map to java bean instance fail", e);
+        }
+        return instance;
+    }
+
+    <T> T mapToBeanOld(final Map<String, Object> map, final Class<T> clazz) {
+        final T instance;
+        try {
+            instance = clazz.getDeclaredConstructor().newInstance();
+            return mapToBeanOld(map, instance);
+        } catch (NoSuchMethodException e) {
+            log.error("Class " + clazz.getName() + " must have a no arguments constructor.", e);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            log.error("Convert map to java bean instance fail", e);
+        }
+        return null;
+    }
+
+    <D, S> D beanToBeanOld(final S src, final D dist) {
+        final Optional<D> result = beanConverterHelper.handleConvertible(src, dist);
+        if (result.isPresent()) {
+            return result.get();
+        }
+
+        try {
+            beanUtilsBean.copyProperties(dist, src);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error("Copy properties fail", e);
+        }
+        return dist;
+    }
+
+    <D, S> D beanToBeanOld(final S src, final Class<D> distClass) {
+
+        final D dist;
+        try {
+            dist = distClass.getDeclaredConstructor().newInstance();
+            return beanToBeanOld(src, dist);
+        } catch (NoSuchMethodException e) {
+            log.error("Class " + distClass.getName() + " must have a no arguments constructor.", e);
+        }  catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Copy properties fail", e);
+        }
+        return null;
+    }
+
+    <T> Map<String, Object> beanToMapOld(final T bean) {
+        final BeanMap beanMap = new BeanMap();
+        beanMap.setBean(bean);
+        Map<String, Object> copy = new HashMap<>();
+
+        for (Object key : beanMap.keySet()) {
+            copy.put(key.toString(), beanMap.get(key));
+        }
+        return copy;
     }
 }
