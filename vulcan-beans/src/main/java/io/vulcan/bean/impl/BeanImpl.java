@@ -10,6 +10,7 @@ import io.vulcan.bean.impl.helper.DateConverter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -304,20 +306,30 @@ public final class BeanImpl implements Bean {
 
     @Override
     public <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz) {
+        return mapToBeanInList(mapList, clazz, false);
+    }
+
+    @Override
+    public <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz, boolean ignoreNull) {
         if (mapList == null || mapList.isEmpty()) {
             return Collections.emptyList();
         }
 
         final MapConverter<T> converter = mapConverterHelper.get(clazz);
         if (converter == null) {
-            return mapList.stream().map(input -> mapToBeanOld(input, clazz)).collect(Collectors.toList());
+            return convertList(mapList, ignoreNull, input -> mapToBeanOld(input, clazz));
         }
 
-        return mapList.stream().map(input -> mapToBean(converter, input, clazz)).collect(Collectors.toList());
+        return convertList(mapList, ignoreNull, input -> mapToBean(converter, input, clazz));
     }
 
     @Override
     public <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList) {
+        return beanToMapInList(beanList, false);
+    }
+
+    @Override
+    public <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList, boolean ignoreNull) {
         if (beanList == null || beanList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -328,7 +340,7 @@ public final class BeanImpl implements Bean {
                 .filter(type -> type.getRawType() == List.class)
                 .findFirst();
         if (!listInterface.isPresent()) {
-            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+            return convertList(beanList, ignoreNull, this::beanToMapOld);
         }
 
         final ParameterizedType listType = listInterface.get();
@@ -336,34 +348,57 @@ public final class BeanImpl implements Bean {
         assert typeParameters.length == 1;
 
         if (!(typeParameters[0] instanceof Class)) {
-            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+            return convertList(beanList, ignoreNull, this::beanToMapOld);
         }
 
         @SuppressWarnings("unchecked")
         final MapReverter<T> reverter = mapReverterHelper.get((Class<T>) typeParameters[0]);
         if (reverter == null) {
-            return beanList.stream().map(this::beanToMapOld).collect(Collectors.toList());
+            return convertList(beanList, ignoreNull, this::beanToMapOld);
         }
 
-        return beanList.stream().map(input -> beanToMap(reverter, input)).collect(Collectors.toList());
+        return convertList(beanList, ignoreNull, input -> beanToMap(reverter, input));
     }
 
     @Override
     public <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass) {
+        return beanToBeanInList(srcList, distClass, false);
+    }
+
+    @Override
+    public <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass, boolean ignoreNull) {
         if (srcList == null || srcList.isEmpty()) {
             return Collections.emptyList();
         }
 
         Optional<Class<S>> listType = beanConverterHelper.getListType(srcList);
         if (!listType.isPresent()) {
-            return srcList.stream().map(input -> beanToBeanOld(input, distClass)).collect(Collectors.toList());
+            return convertList(srcList, ignoreNull, input -> beanToBeanOld(input, distClass));
         }
 
         final BeanConverter<S, D> converter = beanConverterHelper.get(listType.get(), distClass);
         if (converter == null) {
-            return srcList.stream().map(input -> beanToBeanOld(input, distClass)).collect(Collectors.toList());
+            return convertList(srcList, ignoreNull, input -> beanToBeanOld(input, distClass));
         }
 
-        return srcList.stream().map(input -> beanToBean(converter, input, distClass)).collect(Collectors.toList());
+        return convertList(srcList, ignoreNull, input -> beanToBean(converter, input, distClass));
+    }
+
+    private <F,T> List<T> convertList(List<F> inList, boolean ignoreNull, Function<F, T> handler) {
+        if (inList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<T> result = new ArrayList<>(inList.size());
+        for (F input : inList) {
+            if (input != null) {
+                result.add(handler.apply(input));
+                continue;
+            }
+            if (!ignoreNull) {
+                result.add(null);
+            }
+        }
+        return result;
     }
 }

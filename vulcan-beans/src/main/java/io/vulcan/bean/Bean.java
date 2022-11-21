@@ -83,7 +83,13 @@ public interface Bean {
 
     <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz);
 
+    <T> List<T> mapToBeanInList(final List<Map<String, Object>> mapList, final Class<T> clazz, boolean ignoreNull);
+
     <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList);
 
+    <T> List<Map<String, Object>> beanToMapInList(final List<T> beanList, boolean ignoreNull);
+
     <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass);
+
+    <D, S> List<D> beanToBeanInList(final List<S> srcList, final Class<D> distClass, boolean ignoreNull);
 }
