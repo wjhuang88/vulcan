@@ -15,6 +15,7 @@ import io.vulcan.bean.impl.types.TestLongPropDist;
 import io.vulcan.bean.impl.types.TestSrcIntoChild;
 import io.vulcan.bean.impl.types.TestSrcIntoParent;
 import io.vulcan.bean.impl.types.TestTypes;
+import io.vulcan.bean.impl.types.TestTypesConv;
 import io.vulcan.bean.impl.types.TestTypesDist;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,8 +30,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class BeanTest {
+
+    private static final Logger log = LoggerFactory.getLogger(BeanTest.class);
 
     private final Bean beanManager = Bean.getDefault();
 
@@ -147,6 +152,31 @@ class BeanTest {
         typeSrc.setFieldDate(now);
         typeSrc.setFieldString("test_string_filed");
         typeSrc.setFieldLong(20L);
+        typeSrc.setFieldInt(10);
+        typeSrc.setFieldLongBox(30L);
+        typeSrc.setFieldStringArr(new String[]{"test_str_string_0", "test_str_string_1"});
+        typeSrc.setFieldIntArr(new int[]{0, 1});
+
+        TestTypesDist typeDist = beanManager.beanToBean(typeSrc, TestTypesDist.class);
+        assertNotNull(typeDist);
+        assertEquals(now.getTime(), typeDist.getFieldDate().getTime());
+        assertEquals("test_string_filed", typeDist.getFieldString());
+        assertEquals(20L, typeDist.getFieldLong());
+        assertEquals(10, typeDist.getFieldInt());
+        assertEquals(30L, typeDist.getFieldLongBox());
+        assertEquals("test_str_string_0", typeDist.getFieldStringArr()[0]);
+        assertEquals("test_str_string_1", typeDist.getFieldStringArr()[1]);
+        assertEquals(0, typeDist.getFieldIntArr()[0]);
+        assertEquals(1, typeDist.getFieldIntArr()[1]);
+    }
+
+    @Test
+    public void beanToBeanTypesConv() {
+        Date now = new Date();
+        TestTypesConv typeSrc = new TestTypesConv();
+        typeSrc.setFieldDate("2023-06-01 00:00:00");
+        typeSrc.setFieldString(now);
+        typeSrc.setFieldLong("20");
         typeSrc.setFieldInt(10);
         typeSrc.setFieldLongBox(30L);
         typeSrc.setFieldStringArr(new String[]{"test_str_string_0", "test_str_string_1"});
@@ -390,7 +420,7 @@ class BeanTest {
     @Test
     public void beanToMapTest() {
         Map<String, Object> map = beanManager.beanToMap(bean);
-        System.out.println(map);
+        log.info(map.toString());
         assertEquals(bean.getFieldA(), map.get("fieldA"));
         assertEquals(bean.getFieldB(), map.get("fieldB"));
         assertEquals(bean.getFieldC(), map.get("fieldC"));
@@ -398,7 +428,7 @@ class BeanTest {
 
         TestLongProp longProp = new TestLongProp();
         Map<String, Object> longMap = beanManager.beanToMap(longProp);
-        System.out.println(longMap);
+        log.info(longMap.toString());
 
         assertEquals(4L, longMap.get("long4"));
         assertEquals(5L, longMap.get("long5"));
