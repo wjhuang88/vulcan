@@ -22,6 +22,14 @@ public enum Translators {
         translatorMap.put(BigDecimal.class, BigDecimalTranslator.INSTANCE);
         translatorMap.put(BigInteger.class, BigIntegerTranslator.INSTANCE);
         translatorMap.put(String.class, StringTranslator.INSTANCE);
+        translatorMap.put(Long.class, LongTranslator.INSTANCE);
+        translatorMap.put(Byte.class, ByteTranslator.INSTANCE);
+        translatorMap.put(Character.class, CharacterTranslator.INSTANCE);
+        translatorMap.put(Short.class, ShortTranslator.INSTANCE);
+        translatorMap.put(Integer.class, IntegerTranslator.INSTANCE);
+        translatorMap.put(Float.class, FloatTranslator.INSTANCE);
+        translatorMap.put(Double.class, DoubleTranslator.INSTANCE);
+        translatorMap.put(Boolean.class, BooleanTranslator.INSTANCE);
     }
 
     /**
