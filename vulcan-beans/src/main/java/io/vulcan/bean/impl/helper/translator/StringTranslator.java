@@ -12,6 +12,6 @@ enum StringTranslator implements Translator<String> {
         if (value instanceof String) {
             return (String) value;
         }
-        return value.toString();
+        return Tools.dateFormat(value);
     }
 }

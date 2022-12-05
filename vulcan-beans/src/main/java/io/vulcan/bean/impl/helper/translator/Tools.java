@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -14,6 +16,8 @@ import org.slf4j.LoggerFactory;
 public final class Tools {
 
     private static final Logger log = LoggerFactory.getLogger(Tools.class);
+
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd['T']HH:mm:ss");
 
     public static Method getTranslateMethod(final Class<?> methodClass) {
 
@@ -99,12 +103,31 @@ public final class Tools {
 
         if (value instanceof LocalTime) {
             final LocalDateTime ldt = ((LocalTime) value).atDate(LocalDate.now());
-            final Instant inst = Instant.from(ldt);
-            final Date date = Date.from(inst);
-            return date.getTime();
+            final Instant inst = Instant.from(ldt.atZone(ZoneId.systemDefault()));
+            return inst.toEpochMilli();
+        }
+
+        if (value instanceof String) {
+            final Instant inst = Instant.from(DEFAULT_FORMATTER.parse((String) value, LocalDateTime::from).atZone(ZoneId.systemDefault()));
+            return inst.toEpochMilli();
         }
 
         log.warn("对象属性类型转换失败，{} 无法转换为 {}", value.getClass(), Date.class);
         return -1;
+    }
+
+    static String dateFormat(Object value) {
+        if (value instanceof Long || value instanceof String) {
+            return value.toString();
+        }
+
+        final long millis = toMillis(value);
+        if (millis == -1) {
+            return null;
+        }
+
+        final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+
+        return DEFAULT_FORMATTER.format(zonedDateTime);
     }
 }

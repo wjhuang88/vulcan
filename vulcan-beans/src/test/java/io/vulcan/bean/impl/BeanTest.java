@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -173,8 +175,14 @@ class BeanTest {
     @Test
     public void beanToBeanTypesConv() {
         Date now = new Date();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        Date fieldDateValue = Date.from(Instant.from(formatter
+                .parse("2023-06-01T00:00:00", LocalDateTime::from).atZone(ZoneId.systemDefault())));
+        String dateString = formatter.format(
+                ZonedDateTime.ofInstant(Instant.ofEpochMilli(now.getTime()), ZoneId.systemDefault()));
+
         TestTypesConv typeSrc = new TestTypesConv();
-        typeSrc.setFieldDate("2023-06-01 00:00:00");
+        typeSrc.setFieldDate("2023-06-01T00:00:00");
         typeSrc.setFieldString(now);
         typeSrc.setFieldLong("20");
         typeSrc.setFieldInt(10);
@@ -182,10 +190,11 @@ class BeanTest {
         typeSrc.setFieldStringArr(new String[]{"test_str_string_0", "test_str_string_1"});
         typeSrc.setFieldIntArr(new int[]{0, 1});
 
+//        BeanConverterHelper.INSTANCE.saveClassFile(TestTypesConv.class, TestTypesDist.class, "temp");
         TestTypesDist typeDist = beanManager.beanToBean(typeSrc, TestTypesDist.class);
         assertNotNull(typeDist);
-        assertEquals(now.getTime(), typeDist.getFieldDate().getTime());
-        assertEquals("test_string_filed", typeDist.getFieldString());
+        assertEquals(fieldDateValue.getTime(), typeDist.getFieldDate().getTime());
+        assertEquals(dateString, typeDist.getFieldString());
         assertEquals(20L, typeDist.getFieldLong());
         assertEquals(10, typeDist.getFieldInt());
         assertEquals(30L, typeDist.getFieldLongBox());

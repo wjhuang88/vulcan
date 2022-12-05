@@ -39,7 +39,7 @@ public class TestTypesDist {
         return fieldLong;
     }
 
-    public void setFieldLong(long fieldLong) {
+    public void setFieldLong(Long fieldLong) {
         this.fieldLong = fieldLong;
     }
 
