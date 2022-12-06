@@ -2,6 +2,9 @@ package io.vulcan.utils;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class StringUtils {
 
@@ -29,6 +32,31 @@ public final class StringUtils {
 
     public static Joiner joinOn(final String delimiter) {
         return new Joiner(delimiter);
+    }
+
+    public static String patternReplace(String source, Pattern pattern, Function<String, Object> argSupplier) {
+        if (source == null || source.isEmpty()) {
+            return "";
+        }
+        final Matcher matcher = pattern.matcher(source);
+        final StringBuffer resultSb = new StringBuffer();
+        if (matcher.groupCount() < 1) {
+            throw new IllegalArgumentException("Pattern should have more than 1 group, pattern: " + pattern.pattern() + ".");
+        }
+        while (matcher.find()) {
+            final String name = matcher.group(1);
+            final Object argObj = argSupplier.apply(name);
+            if (argObj == null) {
+                // 没有找到参数则直接使用参数名
+                matcher.appendReplacement(resultSb, name);
+                continue;
+            }
+            final String argStr = argObj instanceof String ? (String) argObj : argObj.toString();
+            final String repl = Matcher.quoteReplacement(argStr);
+            matcher.appendReplacement(resultSb, repl);
+        }
+        matcher.appendTail(resultSb);
+        return resultSb.toString();
     }
 
     public static class Joiner {

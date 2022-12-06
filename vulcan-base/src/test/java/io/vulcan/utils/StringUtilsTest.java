@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class StringUtilsTest {
@@ -48,5 +51,20 @@ class StringUtilsTest {
         assertTrue(StringUtils.isNullOrEmpty(null));
         assertTrue(StringUtils.isNullOrEmpty(""));
         assertFalse(StringUtils.isNullOrEmpty("1"));
+    }
+
+    @Test
+    void testPatternReplace() {
+        String template = "您的“${v: ${1}}”,车牌${2}, ${test-value}, ${no-value}";
+        Map<String, Object> contentParamMap = new HashMap<>();
+        contentParamMap.put("1", "奥迪");
+        contentParamMap.put("2", "沪A0001");
+        contentParamMap.put("test-value", "here is a value");
+
+        String result = StringUtils.patternReplace(template, Pattern.compile("\\$\\{([^$^{}]*?)}"), contentParamMap::get);
+
+        assertEquals("您的“${v: 奥迪}”,车牌沪A0001, here is a value, no-value", result);
+
+        assertThrows(IllegalArgumentException.class, () -> StringUtils.patternReplace(template, Pattern.compile("\\$\\{[^$^{}]*?}"), contentParamMap::get));
     }
 }
