@@ -1,6 +1,7 @@
 package io.vulcan.api.eventbus;
 
 import io.vulcan.api.base.functional.Callback;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -80,5 +81,31 @@ public interface EventStrategy extends AutoCloseable {
      */
     default Set<Actions> supportedActions() {
         return allActions;
+    }
+
+    default <T> byte[] encodeValue(T value, Class<T> clazz, ValueEncoder<T> encoder) throws Throwable {
+        byte[] bytes;
+        if (byte[].class == clazz && byte[].class == value.getClass()) {
+            bytes = (byte[]) value;
+        } else if (String.class == clazz && String.class == value.getClass()) {
+            bytes = ((String) value).getBytes(StandardCharsets.UTF_8);
+        } else {
+            bytes = encoder.encode(value);
+        }
+        return bytes;
+    }
+
+    default <T> T decodeValue(byte[] bytes, Class<T> clazz, ValueDecoder<T> decoder) throws Throwable {
+        T value;
+        if (byte[].class == clazz) {
+            value = (T) bytes;
+        } else if (String.class == clazz) {
+            @SuppressWarnings("unchecked")
+            T unchecked = (T) new String(bytes, StandardCharsets.UTF_8);
+            value = unchecked;
+        } else {
+            value = decoder.decode(bytes, clazz);
+        }
+        return value;
     }
 }

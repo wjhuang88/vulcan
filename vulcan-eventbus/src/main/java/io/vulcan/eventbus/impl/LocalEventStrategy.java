@@ -51,8 +51,8 @@ public class LocalEventStrategy implements EventStrategy {
             return;
         }
         try {
-            T decoded = JsonUtils.decode(data, meta.clazz);
-            meta.handler.handle(meta.clazz.cast(decoded));
+            T decoded = decodeValue(data, meta.clazz, JsonUtils::decode);
+            meta.handler.handle(decoded);
         } catch (Throwable e) {
             meta.errorHandler.handle(e);
         }
@@ -72,7 +72,11 @@ public class LocalEventStrategy implements EventStrategy {
     public <T> void send(final String router, final Class<T> clazz, final T payload) {
         disruptor.publishEvent((event, sequence) -> {
             event.setRouter(router);
-            event.setData(JsonUtils.encodeToBytes(payload));
+            try {
+                event.setData(encodeValue(payload, clazz, JsonUtils::encodeToBytes));
+            } catch (Throwable e) {
+                throw new IllegalArgumentException("Payload cannot be encoded to json bytes.", e);
+            }
         });
     }
 
@@ -81,9 +85,9 @@ public class LocalEventStrategy implements EventStrategy {
         disruptor.publishEvent((event, sequence) -> {
             event.setRouter(router);
             try {
-                event.setData(JsonUtils.encodeToBytes(payload));
+                event.setData(encodeValue(payload, clazz, JsonUtils::encodeToBytes));
                 result.onSuccess(payload);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 result.onException(e);
             }
         });
