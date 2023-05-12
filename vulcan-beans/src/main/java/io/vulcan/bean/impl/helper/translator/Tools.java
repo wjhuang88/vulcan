@@ -123,7 +123,7 @@ public final class Tools {
 
         final long millis = toMillis(value);
         if (millis == -1) {
-            return null;
+            return value.toString();
         }
 
         final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
