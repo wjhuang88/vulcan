@@ -15,6 +15,7 @@ public enum Translators {
     private final Map<Class<?>, Translator<?>> translatorMap = new HashMap<>();
 
     Translators() { // 装载内置类型转换器
+        // key为转换的目标类型，value为对应转换器的实例
         translatorMap.put(Date.class, DateTranslator.INSTANCE);
         translatorMap.put(java.sql.Date.class, SqlDateTranslator.INSTANCE);
         translatorMap.put(java.sql.Time.class, SqlTimeTranslator.INSTANCE);

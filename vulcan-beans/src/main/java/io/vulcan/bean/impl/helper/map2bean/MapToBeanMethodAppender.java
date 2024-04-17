@@ -54,7 +54,7 @@ class MapToBeanMethodAppender implements ByteCodeAppender {
 
     private void transferField(MethodVisitor mv, Context ic, String methodName, Class<?> methodClass,
             String methodDescriptor) {
-        final String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+        final String fieldName = FieldNameMapper.mapToField(methodName);
         final Method translateMethod = Tools.getTranslateMethod(methodClass);
         final String translateMethodName = translateMethod.getName();
         final boolean hasClassParams = translateMethodName.equals("translate");

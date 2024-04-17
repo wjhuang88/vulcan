@@ -1,8 +1,5 @@
 package io.vulcan.bean.impl.helper.translator;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 enum LongTranslator implements Translator<Long> {
 
     INSTANCE;

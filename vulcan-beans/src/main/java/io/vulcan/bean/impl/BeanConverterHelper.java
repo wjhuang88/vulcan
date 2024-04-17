@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.DynamicType.Unloaded;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ enum BeanConverterHelper {
     }
 
     @SuppressWarnings("rawtypes")
-    <S, D> DynamicType.Unloaded<BeanConverter> makeUnloaded(final Class<S> srcClass, final Class<D> distClass) {
+    <S, D> Unloaded<BeanConverter> makeUnloaded(final Class<S> srcClass, final Class<D> distClass) {
         return new ByteBuddy()
                 .subclass(BeanConverter.class)
                 .defineField("translators", Translators.class, Modifier.PRIVATE | Modifier.FINAL)
@@ -63,8 +63,8 @@ enum BeanConverterHelper {
 
 //        saveClassFile(srcClass, distClass, "temp");
 
-        try {
-            final BeanConverter<?, ?> converter = makeUnloaded(srcClass, distClass)
+        try(@SuppressWarnings("rawtypes") Unloaded<BeanConverter> unloaded = makeUnloaded(srcClass, distClass)) {
+            final BeanConverter<?, ?> converter = unloaded
                     .load(ClassLoader.getSystemClassLoader())
                     .getLoaded()
                     .getDeclaredConstructor()
@@ -75,9 +75,11 @@ enum BeanConverterHelper {
         }
     }
 
+    // for test
+    @SuppressWarnings("unused")
     <S, D> void saveClassFile(final Class<S> srcClass, final Class<D> distClass, String path) {
-        try {
-            makeUnloaded(srcClass, distClass).saveIn(new File(path));
+        try(@SuppressWarnings("rawtypes") Unloaded<BeanConverter> unloaded = makeUnloaded(srcClass, distClass)) {
+            unloaded.saveIn(new File(path));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,8 +101,8 @@ enum BeanConverterHelper {
             if (log.isDebugEnabled()) {
                 log.debug("Creating cached converter for {} to {} conversion", srcClass, distClass);
             }
-            try {
-                converter = makeUnloaded(srcClass, distClass)
+            try(@SuppressWarnings("rawtypes") Unloaded<BeanConverter> unloaded = makeUnloaded(srcClass, distClass)) {
+                converter = unloaded
                         .load(BeanConverter.class.getClassLoader())
                         .getLoaded()
                         .getDeclaredConstructor()
@@ -165,19 +167,15 @@ enum BeanConverterHelper {
 
     @SuppressWarnings("unchecked")
     <T> Optional<Class<T>> getListType(List<T> list) {
-        final Optional<ParameterizedType> listInterface = Arrays.stream(list.getClass().getGenericInterfaces())
-                .filter(type -> type instanceof ParameterizedType)
-                .map(type -> (ParameterizedType) type)
-                .filter(type -> type.getRawType() == List.class)
-                .findFirst();
-        if (listInterface.isPresent()) {
-            final ParameterizedType listType = listInterface.get();
-            final Type[] typeParameters = listType.getActualTypeArguments();
-            assert typeParameters.length == 1;
-            if (typeParameters[0] instanceof Class) {
-                return Optional.of((Class<T>) typeParameters[0]);
-            }
+        int size = list.size();
+        T item = null;
+        int i = 0;
+        while(i < size && (item = list.get(i)) == null) {
+            i++;
         }
-        return Optional.empty();
+        if (item == null) {
+            return Optional.empty();
+        }
+        return Optional.of((Class<T>) item.getClass());
     }
 }

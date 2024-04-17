@@ -13,7 +13,7 @@ enum DateTranslator implements Translator<Date> {
         return new Date(millis);
     }
 
-    public Date toDate(Object value) {
+    private Date toDate(Object value) {
         if (value instanceof Date) {
             return (Date) value;
         }

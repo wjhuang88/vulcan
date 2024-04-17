@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.DynamicType.Unloaded;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ enum MapConverterHelper {
             .build();
 
     @SuppressWarnings("rawtypes")
-    <T> DynamicType.Unloaded<MapConverter> makeUnloaded(final Class<T> clazz) {
+    <T> Unloaded<MapConverter> makeUnloaded(final Class<T> clazz) {
         return new ByteBuddy()
                 .subclass(MapConverter.class)
                 .defineField("translators", Translators.class, Modifier.PRIVATE | Modifier.FINAL)
@@ -50,8 +50,8 @@ enum MapConverterHelper {
             return;
         }
 
-        try {
-            final MapConverter<?> converter = makeUnloaded(distClass)
+        try(@SuppressWarnings("rawtypes") Unloaded<MapConverter> unloaded = makeUnloaded(distClass)) {
+            final MapConverter<?> converter = unloaded
                     .load(ClassLoader.getSystemClassLoader())
                     .getLoaded()
                     .getDeclaredConstructor()
@@ -62,9 +62,11 @@ enum MapConverterHelper {
         }
     }
 
+    // for test
+    @SuppressWarnings("unused")
     <T> void saveClassFile(final Class<T> clazz, String path) {
-        try {
-            makeUnloaded(clazz).saveIn(new File(path));
+        try(@SuppressWarnings("rawtypes") Unloaded<MapConverter> unloaded = makeUnloaded(clazz)) {
+            unloaded.saveIn(new File(path));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,8 +87,8 @@ enum MapConverterHelper {
             if (log.isDebugEnabled()) {
                 log.debug("Creating cached converter for {}", clazz);
             }
-            try {
-                converter = makeUnloaded(clazz)
+            try(@SuppressWarnings("rawtypes") Unloaded<MapConverter> unloaded = makeUnloaded(clazz)) {
+                converter = unloaded
                         .load(MapConverter.class.getClassLoader())
                         .getLoaded()
                         .getDeclaredConstructor()
