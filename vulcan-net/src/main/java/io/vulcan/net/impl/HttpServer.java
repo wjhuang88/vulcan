@@ -1,5 +1,7 @@
 package io.vulcan.net.impl;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
@@ -8,28 +10,38 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.vulcan.net.CloseHandler;
 import io.vulcan.worker.WorkerPool;
 
-public class HttpServer extends SocketServer {
+public class HttpServer implements CloseHandler {
 
-    public HttpServer(int port) {
-        this(port, WorkerPool.getDefault());
+    private final SocketServer socketServer;
+
+    private static final ChannelHandler[] DEFAULT_HANDLERS = {
+            new HttpServerCodec(),
+            new HttpContentCompressor(),
+            new ChunkedWriteHandler(),
+            new HttpServerKeepAliveHandler(),
+            new HttpServerExpectContinueHandler(),
+            new HttpServerHandler()
+    };
+
+    private HttpServer(SocketServer socketServer) {
+        this.socketServer = socketServer;
     }
 
-    public HttpServer(int port, WorkerPool pool) {
-        super(port, pool);
+    @Override
+    public ChannelFuture closeAsync() {
+        return socketServer.closeAsync();
     }
 
-    public CloseHandler start() {
-        return super.start(
-                new HttpServerCodec(),
-                new HttpContentCompressor(),
-                new ChunkedWriteHandler(),
-                new HttpServerKeepAliveHandler(),
-                new HttpServerExpectContinueHandler(),
-                new HttpServerHandler());
+    public static HttpServer serve(int port, WorkerPool pool) {
+        return new HttpServer(SocketServer.serve(port, pool, DEFAULT_HANDLERS));
     }
+
+    public static HttpServer serve(int port) {
+        return serve(port, WorkerPool.getDefault());
+    }
+
 
     public static void main(String[] args) {
-        HttpServer server = new HttpServer(8888);
-        server.start();
+        HttpServer server = HttpServer.serve(8888);
     }
 }

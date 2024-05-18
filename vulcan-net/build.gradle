@@ -14,8 +14,12 @@ dependencies {
     api 'org.slf4j:slf4j-api'
     api 'io.netty:netty-all'
 
+    testImplementation 'io.vertx:vertx-junit5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-jul'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl'
 }
 
 test {

@@ -1,5 +1,6 @@
 package io.vulcan.net.impl;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -24,12 +25,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     @SuppressWarnings("deprecation")
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
 
+        ByteBuf resBuf = ctx.alloc().buffer();
+        resBuf.writeCharSequence("CONTENT", StandardCharsets.UTF_8);
+
         if (msg instanceof HttpRequest) {
             HttpRequest req = (HttpRequest) msg;
 
             boolean keepAlive = HttpUtil.isKeepAlive(req);
-            FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), OK,
-                    Unpooled.wrappedBuffer("CONTENT".getBytes(StandardCharsets.UTF_8)));
+            FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), OK, resBuf);
             response.headers()
                     .set(CONTENT_TYPE, TEXT_PLAIN)
                     .setInt(CONTENT_LENGTH, response.content().readableBytes());
