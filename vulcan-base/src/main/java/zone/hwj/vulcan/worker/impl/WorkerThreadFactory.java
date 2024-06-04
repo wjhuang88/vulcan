@@ -15,6 +15,7 @@ public class WorkerThreadFactory implements ThreadFactory {
         namePrefix = "vulcan-worker-";
     }
 
+    @Override
     public Thread newThread(@Nonnull Runnable r) {
         Thread t = new Thread(group, r,
                 namePrefix + threadNumber.getAndIncrement(),
