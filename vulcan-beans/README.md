@@ -3,7 +3,7 @@
 工具类定义在：
 
 ```java
-io.vulcan.bean.Bean
+zone.hwj.vulcan.bean.Bean
 ```
 
 **重要：根据JavaBean的一般约定，请确保需要做转换的类型定义中，需要传递的属性都有相对应的getter和setter方法。**
@@ -12,7 +12,7 @@ io.vulcan.bean.Bean
 示例如下：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
@@ -35,7 +35,7 @@ beanManager.mapToBean(map, newObject2); // 此时newObject2会被填充map中的
 示例如下：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
@@ -58,7 +58,7 @@ beanManager.beanToBean(src, dist2); // 此时dist2的属性会被填充src中相
 示例如下：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
@@ -76,7 +76,7 @@ Map<String, Object> map = beanManager.beanToMap(src); // map中包含src对象�
 上述方法有相对应的列表转换方法，可以实现列表批量对象转换：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
@@ -119,41 +119,41 @@ List<Map<String, Object>> mapList = beanManager.beanToMapInList(beanList)
 
 ```java
 // 用于实现map对象到本对象的转换，配合Bean.mapToBean方法使用
-io.vulcan.api.convertible.FromMap
+zone.hwj.vulcan.api.convertible.FromMap
 
 // 用于实现其他对象(T类型)到本对象的转换，配合Bean.beanToBean方法中的目标对象使用
-io.vulcan.api.convertible.From<T>
+zone.hwj.vulcan.api.convertible.From<T>
 
 // 用于实现本对象到其他对象(T类型)的转换，配合Bean.beanToBean方法中的源对象使用
-io.vulcan.api.convertible.Into<T>
+zone.hwj.vulcan.api.convertible.Into<T>
 
 // 注意：同时使用时，From的优先级高于Into
 
 // 如果被转换的类中属性的类型实现了该接口，则会调用copy方法来复制一个新对象存入转换目标，否则使用默认的浅拷贝
-io.vulcan.api.convertible.Copiable<T>
+zone.hwj.vulcan.api.convertible.Copiable<T>
 ```
 
 ### 实现自定义转换器
 可以通过实现自定义转换器并注册到工具类中，实现不侵入原始代码的情况下改变特定类转换的实现逻辑，框架中提供了两种转换器接口分别对应mapToBean和beanToBean的情况：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
 
 // 实现T类型对象的mapToBean的转换逻辑
-io.vulcan.api.helper.map2bean.MapConverter<T>
+zone.hwj.vulcan.api.helper.map2bean.MapConverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapConverter，注册转换器如下：
 beanManager.register(DistClazz.class, mapConverter);
 
 // 实现T类型对象的beanToMap的转换逻辑
-io.vulcan.api.helper.map2bean.MapReverter<T>
+zone.hwj.vulcan.api.helper.map2bean.MapReverter<T>
 // 假设对DistClazz类的转换器实现类对象为mapReverter，注册转换器如下：
 beanManager.register(DistClazz.class, mapReverter);
 
 // 实现S类型对象到D类型对象的转换逻辑
-io.vulcan.api.helper.bean2bean.BeanConverter<S,D>
+zone.hwj.vulcan.api.helper.bean2bean.BeanConverter<S,D>
 // 假设对SrcClazz到DistClazz的转换器实现类对象为beanConverter，注册转换器如下：
 beanManager.register(SrcClazz.class, DistClazz.class, beanConverter);
 ```
@@ -162,7 +162,7 @@ beanManager.register(SrcClazz.class, DistClazz.class, beanConverter);
 框架通过运行时动态生成转换器对象并缓存来实现高性能的对象转换，因此每个类型的对象在系统运行的第一次转换会有额外的性能消耗(即使如此在压测中的表现也比一般的beanutils更好)，而系统预热完成后的转换性能理论上可以达到和手写setter方法同样的性能，而如果你已经知道系统运行过程中会有多少类型会发生类型转换的操作，框架工具类也提供了预热方法，可以在系统启动过程中提前完成预热动作，压榨最后的性能空间：
 
 ```java
-import io.vulcan.bean.Bean;
+import zone.hwj.vulcan.bean.Bean;
 // ...
 
 Bean beanManager = Bean.getDefault();
